@@ -51,15 +51,7 @@ import {
 } from "@/components/ui/card";
 import { Field, Input, Label, Select, Textarea } from "@/components/ui/form";
 import {
-  announcements as announcementSeed,
-  courts,
-  events,
-  initialBookings,
-  openPlayMatches as openPlayMatchSeed,
-  openPlayParticipants as openPlayParticipantSeed,
-  openPlaySessions,
   paymentSettings,
-  tournaments,
   type Booking,
   type BookingStatus,
   type Court,
@@ -73,7 +65,7 @@ import {
   type Role,
   type SkillLevel,
   type Tournament,
-} from "@/lib/demo-data";
+} from "@/lib/app-data";
 import {
   normalizeUsername,
   usernameToAuthEmailCandidates,
@@ -536,7 +528,7 @@ function getReceiptSrc(receiptName?: string, receiptUrl?: string) {
     }
   }
 
-  // Demo fallback photos for pre-seeded demo records ONLY
+  // Legacy receipt-name fallbacks for older local records.
   if (name.includes("maria")) {
     return "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800&auto=format&fit=crop";
   }
@@ -731,7 +723,6 @@ function PaymentInfoCard({
 
 function AuthPanel({
   authMode,
-  authRole,
   fullName,
   message,
   password,
@@ -744,12 +735,10 @@ function AuthPanel({
   onLogout,
   onPasswordChange,
   onPhoneChange,
-  onRoleChange,
   onUsernameChange,
   onSubmit,
 }: {
   authMode: AuthMode;
-  authRole: Role;
   fullName: string;
   message: string;
   password: string;
@@ -762,7 +751,6 @@ function AuthPanel({
   onLogout: () => void | Promise<void>;
   onPasswordChange: (value: string) => void;
   onPhoneChange: (value: string) => void;
-  onRoleChange: (value: Role) => void;
   onUsernameChange: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
@@ -847,6 +835,12 @@ function AuthPanel({
         </div>
       </CardHeader>
       <CardContent>
+        {!supabaseReady && (
+          <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-900">
+            Account access is temporarily unavailable. Please contact the
+            administrator.
+          </p>
+        )}
         <form
           className="grid gap-4 lg:grid-cols-4 lg:items-end"
           onSubmit={onSubmit}
@@ -863,6 +857,7 @@ function AuthPanel({
                   <Input
                     id="auth-name"
                     className="pl-9"
+                    disabled={!supabaseReady}
                     placeholder="Juan Dela Cruz"
                     value={fullName}
                     onChange={(event) => onFullNameChange(event.target.value)}
@@ -881,6 +876,7 @@ function AuthPanel({
                   <Input
                     id="auth-phone"
                     className="pl-9"
+                    disabled={!supabaseReady}
                     placeholder="0917 000 0000"
                     value={phone}
                     onChange={(event) => onPhoneChange(event.target.value)}
@@ -901,6 +897,7 @@ function AuthPanel({
                 id="auth-username"
                 className="pl-9"
                 autoComplete="username"
+                disabled={!supabaseReady}
                 pattern="[A-Za-z0-9_]{3,32}"
                 placeholder="juan_player"
                 value={username}
@@ -920,6 +917,7 @@ function AuthPanel({
               <Input
                 id="auth-password"
                 className="pl-9"
+                disabled={!supabaseReady}
                 type="password"
                 minLength={6}
                 placeholder="At least 6 characters"
@@ -930,23 +928,11 @@ function AuthPanel({
             </div>
           </Field>
 
-          {!supabaseReady && (
-            <Field>
-              <Label htmlFor="auth-role">
-                {authMode === "login" ? "Demo Dashboard" : "Demo Role"}
-              </Label>
-              <Select
-                id="auth-role"
-                value={authRole}
-                onChange={(event) => onRoleChange(event.target.value as Role)}
-              >
-                <option value="player">Player/User</option>
-                <option value="admin">Admin/Manager</option>
-              </Select>
-            </Field>
-          )}
-
-          <Button className="w-full lg:w-auto" type="submit">
+          <Button
+            className="w-full lg:w-auto"
+            type="submit"
+            disabled={!supabaseReady}
+          >
             {authMode === "login" ? (
               <LogIn className="h-4 w-4" aria-hidden="true" />
             ) : (
@@ -1122,55 +1108,43 @@ export function CourtManagementSystem() {
   const [playerTab, setPlayerTab] = useState<PlayerTab>("book");
   const [adminTab, setAdminTab] = useState<AdminTab>("dashboard");
   const [authMode, setAuthMode] = useState<AuthMode>("login");
-  const [authRole, setAuthRole] = useState<Role>("player");
   const [authFullName, setAuthFullName] = useState("");
   const [authUsername, setAuthUsername] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authPhone, setAuthPhone] = useState("");
   const [authMessage, setAuthMessage] = useState("");
   const [signedInUser, setSignedInUser] = useState<SignedInUser | null>(null);
-  const [managedCourts, setManagedCourts] = useState<Court[]>(
-    supabaseReady ? [] : courts,
-  );
-  const [bookings, setBookings] = useState<Booking[]>(
-    supabaseReady ? [] : initialBookings,
-  );
+  const [managedCourts, setManagedCourts] = useState<Court[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [managedSessions, setManagedSessions] =
-    useState<OpenPlaySession[]>(openPlaySessions);
+    useState<OpenPlaySession[]>([]);
   const [openPlayApplicants, setOpenPlayApplicants] = useState<
     OpenPlayParticipant[]
-  >(openPlayParticipantSeed);
+  >([]);
   const [openPlayMatchups, setOpenPlayMatchups] =
-    useState<OpenPlayMatch[]>(openPlayMatchSeed);
-  const [selectedOpenPlaySessionId, setSelectedOpenPlaySessionId] = useState(
-    openPlaySessions[0]?.id ?? "",
-  );
+    useState<OpenPlayMatch[]>([]);
+  const [selectedOpenPlaySessionId, setSelectedOpenPlaySessionId] =
+    useState("");
   const [managedTournaments, setManagedTournaments] =
-    useState<Tournament[]>(tournaments);
-  const [selectedTournamentId, setSelectedTournamentId] = useState(
-    tournaments[0]?.id ?? "",
-  );
+    useState<Tournament[]>([]);
+  const [selectedTournamentId, setSelectedTournamentId] = useState("");
   const [tournamentRegistrations, setTournamentRegistrations] = useState<
     TournamentParticipantRecord[]
   >([]);
   const [tournamentMatchups, setTournamentMatchups] = useState<
     TournamentMatch[]
   >([]);
-  const [managedEvents, setManagedEvents] = useState<CourtEvent[]>(events);
-  const [announcementList, setAnnouncementList] = useState(announcementSeed);
+  const [managedEvents, setManagedEvents] = useState<CourtEvent[]>([]);
+  const [announcementList, setAnnouncementList] = useState<string[]>([]);
   const [paymentInfo, setPaymentInfo] =
     useState<PaymentSettingsState>(paymentSettings);
   const [blockedSlots, setBlockedSlots] = useState<BlockedSlot[]>([]);
   const [bookingDataLoaded, setBookingDataLoaded] = useState(!supabaseReady);
   const [bookingDataMessage, setBookingDataMessage] = useState("");
 
-  const [selectedCourtId, setSelectedCourtId] = useState(
-    supabaseReady ? "" : courts[0].id,
-  );
+  const [selectedCourtId, setSelectedCourtId] = useState("");
   const [selectedDate, setSelectedDate] = useState(DEFAULT_BOOKING_DATE);
-  const [selectedStart, setSelectedStart] = useState(
-    supabaseReady ? "08:00" : courts[0].slots[0],
-  );
+  const [selectedStart, setSelectedStart] = useState("08:00");
   const [selectedHours, setSelectedHours] = useState(2);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("GCash");
   const [reference, setReference] = useState("");
@@ -1235,9 +1209,7 @@ export function CourtManagementSystem() {
     title: string;
   } | null>(null);
 
-  const [slotCourtId, setSlotCourtId] = useState(
-    supabaseReady ? "" : courts[0].id,
-  );
+  const [slotCourtId, setSlotCourtId] = useState("");
   const [newSlot, setNewSlot] = useState("21:00");
   const [blockDate, setBlockDate] = useState("2026-08-22");
   const [blockStart, setBlockStart] = useState("13:00");
@@ -1245,9 +1217,7 @@ export function CourtManagementSystem() {
   const [blockReason, setBlockReason] = useState("Private use");
 
   const [newSessionTitle, setNewSessionTitle] = useState("Skills Mixer");
-  const [newSessionCourtIds, setNewSessionCourtIds] = useState<string[]>(
-    supabaseReady ? [] : [courts[0].id],
-  );
+  const [newSessionCourtIds, setNewSessionCourtIds] = useState<string[]>([]);
   const [newSessionDate, setNewSessionDate] = useState("2026-08-30");
   const [newSessionStart, setNewSessionStart] = useState("16:00");
   const [newSessionHours, setNewSessionHours] = useState(2);
@@ -1296,14 +1266,13 @@ export function CourtManagementSystem() {
   }, []);
 
   const resetBookingDraft = useCallback(() => {
-    const defaultCourt =
-      managedCourts[0] ?? (supabaseReady ? noConfiguredCourt : courts[0]);
+    const defaultCourt = managedCourts[0] ?? noConfiguredCourt;
     const defaultSlots = getCompleteCourtSlots(defaultCourt);
 
     setSelectedCourtId(defaultCourt.id);
     setSelectedStart(defaultSlots[0] ?? defaultCourt.open ?? "08:00");
     clearBookingDraftInputs();
-  }, [clearBookingDraftInputs, managedCourts, supabaseReady]);
+  }, [clearBookingDraftInputs, managedCourts]);
 
   const handlePlayerTabChange = useCallback(
     (nextTab: PlayerTab) => {
@@ -1397,8 +1366,8 @@ export function CourtManagementSystem() {
 
       if (event === "SIGNED_OUT" || !session?.user) {
         clearBookingDraftInputs();
-        setSelectedCourtId(supabaseReady ? "" : courts[0].id);
-        setSelectedStart(supabaseReady ? "08:00" : courts[0].slots[0]);
+        setSelectedCourtId("");
+        setSelectedStart("08:00");
         setSignedInUser(null);
         setRole("player");
         setPlayerTab("book");
@@ -1635,7 +1604,7 @@ export function CourtManagementSystem() {
         setSlotCourtId("");
         setNewSessionCourtIds([]);
         setBookingDataMessage(
-          "No courts are configured in Supabase yet. Run the court seed SQL, then refresh this page.",
+          "No courts are configured yet. Add court records, then refresh this page.",
         );
       } else {
         const firstCourt = nextCourts[0];
@@ -2053,6 +2022,13 @@ export function CourtManagementSystem() {
   async function handleAuthSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (!supabaseReady) {
+      setAuthMessage(
+        "Account access is temporarily unavailable. Please contact the administrator.",
+      );
+      return;
+    }
+
     const username = normalizeUsername(authUsername);
     let authEmails: string[] = [];
 
@@ -2073,8 +2049,7 @@ export function CourtManagementSystem() {
         ? authFullName.trim()
         : fallbackName;
 
-    let resolvedRole: Role = supabaseReady ? "player" : authRole;
-    let serverBacked = false;
+    let resolvedRole: Role = "player";
 
     try {
       const supabase = createSupabaseBrowserClient();
@@ -2144,8 +2119,6 @@ export function CourtManagementSystem() {
         return;
       }
 
-      serverBacked = true;
-
       if (authMode === "register" && !result.data.session) {
         setAuthMessage(
           "Account created, but Supabase confirmation is still enabled. Disable confirmation for username-only login, then sign in with this username.",
@@ -2172,7 +2145,10 @@ export function CourtManagementSystem() {
         }
       }
     } catch {
-      serverBacked = false;
+      setAuthMessage(
+        "Account access is temporarily unavailable. Please try again later.",
+      );
+      return;
     }
 
     setSignedInUser({
@@ -2185,9 +2161,7 @@ export function CourtManagementSystem() {
     setAuthMessage(
       authMode === "login"
         ? `Welcome back, ${displayName}.`
-        : serverBacked
-          ? `Account created for ${displayName}. You can now log in with your username.`
-          : `Demo account created for ${displayName}. Add Supabase env vars to enable live auth.`,
+        : `Account created for ${displayName}. You can now log in with your username.`,
     );
 
     if (resolvedRole === "admin") {
@@ -3550,18 +3524,21 @@ export function CourtManagementSystem() {
     const fallbackTeams = doublesTeams(shuffleNames(fallbackPlayers)).map(
       (team) => teamLabel(team),
     );
-    const seeds =
+    const bracketEntries =
       eliminationWinners.length >= 2 ? eliminationWinners : fallbackTeams;
 
-    if (seeds.length < 2) {
+    if (bracketEntries.length < 2) {
       pushNotification(
         "At least two verified doubles teams are needed to build a bracket.",
       );
       return;
     }
 
-    const nextRound: CompetitionRound = seeds.length > 2 ? "Semifinals" : "Finals";
-    const nextMatches: OpenPlayMatch[] = pairNames(seeds.slice(0, 4)).map(
+    const nextRound: CompetitionRound =
+      bracketEntries.length > 2 ? "Semifinals" : "Finals";
+    const nextMatches: OpenPlayMatch[] = pairNames(
+      bracketEntries.slice(0, 4),
+    ).map(
       ([playerOne, playerTwo], index) => ({
         id: createTimestampId(`OP-${sessionId}-${nextRound}-${index}`),
         playerOne,
@@ -3854,18 +3831,21 @@ export function CourtManagementSystem() {
     const fallbackTeams = doublesTeams(shuffleNames(fallbackPlayers)).map(
       (team) => teamLabel(team),
     );
-    const seeds =
+    const bracketEntries =
       eliminationWinners.length >= 2 ? eliminationWinners : fallbackTeams;
 
-    if (seeds.length < 2) {
+    if (bracketEntries.length < 2) {
       pushNotification(
         "At least two approved doubles teams are needed to build a bracket.",
       );
       return;
     }
 
-    const nextRound: CompetitionRound = seeds.length > 2 ? "Semifinals" : "Finals";
-    const nextMatches: TournamentMatch[] = pairNames(seeds.slice(0, 4)).map(
+    const nextRound: CompetitionRound =
+      bracketEntries.length > 2 ? "Semifinals" : "Finals";
+    const nextMatches: TournamentMatch[] = pairNames(
+      bracketEntries.slice(0, 4),
+    ).map(
       ([playerOne, playerTwo], index) => ({
         id: createTimestampId(`T-${tournamentId}-${nextRound}-${index}`),
         playerOne,
@@ -3992,7 +3972,6 @@ export function CourtManagementSystem() {
 
             <AuthPanel
               authMode={authMode}
-              authRole={authRole}
               fullName={authFullName}
               message={authMessage}
               password={authPassword}
@@ -4008,7 +3987,6 @@ export function CourtManagementSystem() {
               onLogout={handleLogout}
               onPasswordChange={setAuthPassword}
               onPhoneChange={setAuthPhone}
-              onRoleChange={setAuthRole}
               onUsernameChange={setAuthUsername}
               onSubmit={handleAuthSubmit}
             />

@@ -7,7 +7,7 @@ import type {
   PaymentMethod,
   PaymentStatus,
   SkillLevel,
-} from "@/lib/demo-data";
+} from "@/lib/app-data";
 
 type ParticipantCreateRequest = {
   amount?: unknown;

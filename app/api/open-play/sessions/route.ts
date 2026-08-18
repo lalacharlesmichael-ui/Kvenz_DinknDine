@@ -6,7 +6,7 @@ import type {
   OpenPlayFormat,
   OpenPlaySession,
   SkillLevel,
-} from "@/lib/demo-data";
+} from "@/lib/app-data";
 
 type OpenPlaySessionRequest = {
   courtIds?: unknown;

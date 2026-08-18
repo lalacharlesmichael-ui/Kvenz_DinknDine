@@ -109,12 +109,6 @@ export type OpenPlayMatch = {
   winner?: string;
 };
 
-export const courtIds = {
-  a: "11111111-1111-4111-8111-111111111111",
-  b: "22222222-2222-4222-8222-222222222222",
-  c: "33333333-3333-4333-8333-333333333333",
-} as const;
-
 export type Tournament = {
   id: string;
   name: string;
@@ -142,118 +136,6 @@ export type Event = {
   attendees: number;
   status: "Open" | "Closed";
 };
-
-export const courts: Court[] = [
-  {
-    id: courtIds.a,
-    name: "Court A",
-    surface: "Cushioned acrylic",
-    zone: "Near entrance",
-    pricePerHour: 420,
-    nightPricePerHour: 500,
-    nightStartsAt: "17:00",
-    open: "06:00",
-    close: "22:00",
-    enabled: true,
-    slots: ["06:00", "07:00", "08:00", "10:00", "14:00", "16:00", "18:00", "20:00"],
-    image: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: courtIds.b,
-    name: "Court B",
-    surface: "Outdoor hard court",
-    zone: "Garden side",
-    pricePerHour: 380,
-    nightPricePerHour: 460,
-    nightStartsAt: "17:00",
-    open: "07:00",
-    close: "21:00",
-    enabled: true,
-    slots: ["07:00", "09:00", "11:00", "13:00", "15:00", "17:00", "19:00"],
-    image: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: courtIds.c,
-    name: "Court C",
-    surface: "Covered synthetic",
-    zone: "Training wing",
-    pricePerHour: 500,
-    nightPricePerHour: 600,
-    nightStartsAt: "17:00",
-    open: "08:00",
-    close: "23:00",
-    enabled: true,
-    slots: ["08:00", "09:00", "12:00", "14:00", "16:00", "18:00", "21:00"],
-    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200&auto=format&fit=crop",
-  },
-];
-
-export const initialBookings: Booking[] = [
-  {
-    id: "BKG-1040",
-    courtId: courtIds.b,
-    courtName: "Court B",
-    player: "Maria Santos",
-    playerUsername: "maria_santos",
-    date: "2026-08-20",
-    startTime: "09:00",
-    endTime: "11:00",
-    hours: 2,
-    amount: 760,
-    status: "Approved",
-    paymentMethod: "GCash",
-    paymentStatus: "Verified",
-    reference: "GC-992811",
-    receiptName: "receipt_maria.png",
-  },
-  {
-    id: "BKG-1041",
-    courtId: courtIds.a,
-    courtName: "Court A",
-    player: "Carlo Reyes",
-    playerUsername: "carlo_reyes",
-    date: "2026-08-20",
-    startTime: "14:00",
-    endTime: "16:00",
-    hours: 2,
-    amount: 840,
-    status: "Approved",
-    paymentMethod: "Bank Transfer",
-    paymentStatus: "Verified",
-    reference: "BPI-882244",
-    receiptName: "bpi_carlo.pdf",
-  },
-  {
-    id: "BKG-1042",
-    courtId: courtIds.b,
-    courtName: "Court B",
-    player: "Elena Cruz",
-    playerUsername: "elena_cruz",
-    date: "2026-08-20",
-    startTime: "14:00",
-    endTime: "15:00",
-    hours: 1,
-    amount: 380,
-    status: "Pending",
-    paymentMethod: "GCash",
-    paymentStatus: "Submitted",
-    reference: "GC-331199",
-    receiptName: "gcash_elena.jpg",
-  },
-];
-
-
-export const openPlaySessions: OpenPlaySession[] = [];
-
-export const openPlayParticipants: OpenPlayParticipant[] = [];
-
-export const openPlayMatches: OpenPlayMatch[] = [];
-
-export const tournaments: Tournament[] = [];
-
-export const events: Event[] = [];
-
-export const announcements: string[] = [];
 
 export const paymentSettings = {
   gcashNumber: "0917 555 0188",

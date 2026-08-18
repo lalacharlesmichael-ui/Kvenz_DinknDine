@@ -569,7 +569,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Selected court is not configured in Supabase. Run the court seed SQL, then refresh the booking page.",
+          "Selected court is not configured. Please refresh the booking page or choose another court.",
       },
       { status: 400 },
     );
