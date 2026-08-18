@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540" role="img" aria-labelledby="title desc">
+  <title id="title">Pickleball clinic court</title>
+  <desc id="desc">A clean court illustration with training markers for a pickleball clinic.</desc>
+  <rect width="900" height="540" fill="#f4f7f0"/>
+  <rect x="86" y="62" width="728" height="416" rx="18" fill="#2f8f7a"/>
+  <rect x="124" y="96" width="652" height="348" rx="8" fill="#f6fbf7" opacity=".14"/>
+  <g fill="none" stroke="#ffffff" stroke-width="8">
+    <rect x="126" y="96" width="648" height="348"/>
+    <path d="M450 96v348"/>
+    <path d="M126 270h648"/>
+    <path d="M288 96v348"/>
+    <path d="M612 96v348"/>
+  </g>
+  <path d="M450 96v348" stroke="#263238" stroke-width="6" stroke-dasharray="18 12"/>
+  <g fill="#f59e0b">
+    <circle cx="241" cy="178" r="20"/>
+    <circle cx="358" cy="356" r="20"/>
+    <circle cx="653" cy="184" r="20"/>
+    <circle cx="558" cy="356" r="20"/>
+  </g>
+  <g stroke="#1f2937" stroke-linecap="round" stroke-width="9">
+    <path d="M215 342l58-58"/>
+    <path d="M675 215l-52 60"/>
+  </g>
+  <circle cx="700" cy="328" r="18" fill="#e11d48"/>
+  <circle cx="205" cy="219" r="18" fill="#2563eb"/>
+</svg>

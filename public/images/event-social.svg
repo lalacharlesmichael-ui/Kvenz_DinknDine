@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540" role="img" aria-labelledby="title desc">
+  <title id="title">Social pickleball games</title>
+  <desc id="desc">Two pickleball courts set for casual social games.</desc>
+  <rect width="900" height="540" fill="#f8fafc"/>
+  <rect x="72" y="70" width="756" height="400" rx="24" fill="#e8f5f0"/>
+  <rect x="116" y="118" width="300" height="304" rx="10" fill="#227c70"/>
+  <rect x="484" y="118" width="300" height="304" rx="10" fill="#3b82f6"/>
+  <g fill="none" stroke="#ffffff" stroke-width="7">
+    <rect x="142" y="146" width="248" height="248"/>
+    <path d="M266 146v248M142 270h248"/>
+    <path d="M204 146v248M328 146v248"/>
+    <rect x="510" y="146" width="248" height="248"/>
+    <path d="M634 146v248M510 270h248"/>
+    <path d="M572 146v248M696 146v248"/>
+  </g>
+  <g fill="#f59e0b">
+    <circle cx="208" cy="192" r="19"/>
+    <circle cx="338" cy="346" r="19"/>
+    <circle cx="573" cy="198" r="19"/>
+    <circle cx="702" cy="344" r="19"/>
+  </g>
+  <g fill="#0f172a">
+    <rect x="426" y="250" width="48" height="40" rx="8"/>
+    <circle cx="450" cy="236" r="20"/>
+  </g>
+  <path d="M425 332c58 26 91 26 150 0" stroke="#e11d48" stroke-width="10" stroke-linecap="round"/>
+</svg>
