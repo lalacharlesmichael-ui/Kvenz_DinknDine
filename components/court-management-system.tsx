@@ -633,7 +633,7 @@ function NavButton({
   return (
     <button
       className={cn(
-        "inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold transition-colors",
+        "inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 text-sm font-semibold transition-colors",
         active
           ? "bg-black text-lime-200"
           : "bg-white text-stone-700 hover:bg-stone-100",
@@ -659,9 +659,11 @@ function StatTile({
   accent: string;
 }) {
   return (
-    <div className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm">
+    <div className="min-w-0 rounded-lg border border-stone-200 bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-medium text-stone-600">{label}</span>
+        <span className="min-w-0 text-sm font-medium text-stone-600">
+          {label}
+        </span>
         <span
           className={cn(
             "inline-flex h-9 w-9 items-center justify-center rounded-md",
@@ -671,7 +673,9 @@ function StatTile({
           <Icon className="h-4 w-4" aria-hidden="true" />
         </span>
       </div>
-      <p className="mt-3 text-2xl font-bold text-stone-950">{value}</p>
+      <p className="mt-3 break-words text-2xl font-bold text-stone-950">
+        {value}
+      </p>
     </div>
   );
 }
@@ -698,7 +702,7 @@ function PaymentInfoCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-[104px_1fr] gap-4">
+        <div className="grid gap-4 min-[420px]:grid-cols-[104px_1fr]">
           <Image
             src={paymentInfo.qrCode}
             alt="Payment QR code"
@@ -757,18 +761,18 @@ function AuthPanel({
   if (signedInUser) {
     return (
       <Card className="border-lime-200 bg-white">
-        <CardContent className="flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-md bg-black text-lime-200">
+        <CardContent className="flex flex-col gap-4 p-4 sm:p-5 md:flex-row md:items-center md:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-black text-lime-200">
               {signedInUser.role === "admin" ? (
                 <ShieldCheck className="h-5 w-5" aria-hidden="true" />
               ) : (
                 <UserRound className="h-5 w-5" aria-hidden="true" />
               )}
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-semibold text-stone-950">
+                <p className="break-words font-semibold text-stone-950">
                   {signedInUser.fullName}
                 </p>
                 <Badge
@@ -779,10 +783,17 @@ function AuthPanel({
                     : "Player/User"}
                 </Badge>
               </div>
-              <p className="text-sm text-stone-600">@{signedInUser.username}</p>
+              <p className="break-words text-sm text-stone-600">
+                @{signedInUser.username}
+              </p>
             </div>
           </div>
-          <Button type="button" variant="outline" onClick={onLogout}>
+          <Button
+            className="w-full md:w-auto"
+            type="button"
+            variant="outline"
+            onClick={onLogout}
+          >
             <LogOut className="h-4 w-4" aria-hidden="true" />
             Log out
           </Button>
@@ -802,7 +813,7 @@ function AuthPanel({
               roles are assigned in the database.
             </CardDescription>
           </div>
-          <div className="grid grid-cols-2 gap-2 rounded-lg bg-stone-100 p-1">
+          <div className="grid w-full grid-cols-2 gap-2 rounded-lg bg-stone-100 p-1 sm:w-auto">
             <button
               className={cn(
                 "inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold transition-colors",
@@ -851,7 +862,7 @@ function AuthPanel({
                 <Label htmlFor="auth-name">Full Name</Label>
                 <div className="relative">
                   <UserRound
-                    className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-stone-400"
+              className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-stone-400"
                     aria-hidden="true"
                   />
                   <Input
@@ -976,19 +987,19 @@ function LandingHero({
 
       <div className="relative mx-auto flex min-h-[84svh] w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
         <nav className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <Image
               src="/kvenz.jpg"
               alt="KVENS PLACE DINK & DINE logo"
               width={72}
               height={72}
-              className="h-14 w-14 rounded-md border border-lime-300/50 object-cover shadow-lg shadow-lime-500/20"
+              className="h-12 w-12 shrink-0 rounded-md border border-lime-300/50 object-cover shadow-lg shadow-lime-500/20 sm:h-14 sm:w-14"
             />
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-bold uppercase tracking-[0.28em] text-lime-300">
                 Pickleball
               </p>
-              <p className="text-sm font-semibold text-white">
+              <p className="break-words text-sm font-semibold text-white">
                 KVENS PLACE DINK &amp; DINE
               </p>
             </div>
@@ -1041,7 +1052,7 @@ function LandingHero({
             <Badge className="border-lime-300/40 bg-lime-300/15 text-lime-200">
               Court bookings, open play, tournaments, and events
             </Badge>
-            <h1 className="mt-6 max-w-3xl text-5xl font-black leading-[1.02] text-white sm:text-6xl lg:text-7xl">
+            <h1 className="mt-6 max-w-3xl break-words text-4xl font-black leading-[1.04] text-white sm:text-6xl lg:text-7xl">
               KVENS PLACE DINK &amp; DINE
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-stone-200 sm:text-xl">
@@ -1051,20 +1062,20 @@ function LandingHero({
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button
-                className="bg-lime-300 text-black hover:bg-lime-200"
-                size="lg"
-                type="button"
-                onClick={onLogin}
-              >
+            <Button
+              className="w-full bg-lime-300 text-black hover:bg-lime-200 sm:w-auto"
+              size="lg"
+              type="button"
+              onClick={onLogin}
+            >
                 <CalendarClock className="h-5 w-5" aria-hidden="true" />
                 Login to Book
               </Button>
-              <Button
-                className="border-white/30 bg-white/10 text-white hover:bg-white/20"
-                size="lg"
-                type="button"
-                variant="outline"
+            <Button
+              className="w-full border-white/30 bg-white/10 text-white hover:bg-white/20 sm:w-auto"
+              size="lg"
+              type="button"
+              variant="outline"
                 onClick={onRegister}
               >
                 <UserPlus className="h-5 w-5" aria-hidden="true" />
@@ -3999,29 +4010,29 @@ export function CourtManagementSystem() {
   return (
     <div className="min-h-screen bg-[#f5f7ef] text-stone-950">
       <header className="sticky top-0 z-20 border-b border-stone-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center gap-3">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-3 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:px-8">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
               <Image
                 src="/kvenz.jpg"
                 alt="KVENS PLACE DINK & DINE logo"
                 width={64}
                 height={64}
-                className="h-14 w-14 rounded-md border border-lime-300 object-cover shadow-sm"
+                className="h-12 w-12 shrink-0 rounded-md border border-lime-300 object-cover shadow-sm sm:h-14 sm:w-14"
               />
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm font-semibold uppercase tracking-[0.18em] text-lime-700">
                   Pickleball
                 </p>
-                <h1 className="text-2xl font-bold text-stone-950">
+                <h1 className="break-words text-xl font-bold leading-6 text-stone-950 sm:text-2xl">
                   KVENS PLACE DINK &amp; DINE
                 </h1>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:w-auto lg:justify-end">
               {/* Top Navbar Icons (Payment, Notifications, Announcements) */}
-              <div className="relative flex items-center gap-2">
+              <div className="relative flex items-center gap-2 self-start">
                 <button
                   type="button"
                   title="Payment Details"
@@ -4101,9 +4112,9 @@ export function CourtManagementSystem() {
                       onClick={() => setActiveHeaderPopover(null)}
                     />
 
-                    <div className="absolute right-0 top-12 z-50 w-80 sm:w-96 rounded-xl border border-stone-200 bg-white p-4 shadow-xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-2">
-                      <div className="flex items-center justify-between border-b border-stone-100 pb-3 mb-3">
-                        <h3 className="font-semibold text-stone-950 flex items-center gap-2">
+                    <div className="absolute left-0 top-12 z-50 w-[min(calc(100vw-1.5rem),24rem)] rounded-xl border border-stone-200 bg-white p-3 shadow-xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-2 sm:left-auto sm:right-0 sm:p-4">
+                      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-3">
+                        <h3 className="flex items-center gap-2 font-semibold text-stone-950">
                           {activeHeaderPopover === "payment" && (
                             <>
                               <CreditCard className="h-4 w-4 text-lime-700" />
@@ -4156,7 +4167,7 @@ export function CourtManagementSystem() {
                           <p className="text-xs text-stone-500">
                             Manual verification after receipt upload.
                           </p>
-                          <div className="grid grid-cols-[96px_1fr] gap-3 rounded-lg border border-stone-200 bg-stone-50 p-3">
+                          <div className="grid gap-3 rounded-lg border border-stone-200 bg-stone-50 p-3 min-[380px]:grid-cols-[96px_1fr]">
                             <Image
                               src={paymentInfo.qrCode}
                               alt="Payment QR code"
@@ -4266,7 +4277,7 @@ export function CourtManagementSystem() {
               </div>
 
               {/* User Profile Card */}
-              <div className="flex items-center gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-sm">
+              <div className="flex w-full min-w-0 items-center gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-sm sm:w-auto">
                 <div className="flex h-10 w-10 items-center justify-center rounded-md bg-black text-lime-200">
                   {signedInUser.role === "admin" ? (
                     <ShieldCheck className="h-5 w-5" aria-hidden="true" />
@@ -4292,6 +4303,7 @@ export function CourtManagementSystem() {
                   </p>
                 </div>
                 <Button
+                  className="ml-auto"
                   size="sm"
                   type="button"
                   variant="outline"
@@ -4305,7 +4317,7 @@ export function CourtManagementSystem() {
           </div>
 
           {role === "player" ? (
-            <nav className="flex gap-2 overflow-x-auto pb-1">
+            <nav className="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0">
               <NavButton
                 active={playerTab === "book"}
                 onClick={() => handlePlayerTabChange("book")}
@@ -4343,7 +4355,7 @@ export function CourtManagementSystem() {
               </NavButton>
             </nav>
           ) : (
-            <nav className="flex gap-2 overflow-x-auto pb-1">
+            <nav className="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0">
               <NavButton
                 active={adminTab === "dashboard"}
                 onClick={() => setAdminTab("dashboard")}
@@ -4391,7 +4403,7 @@ export function CourtManagementSystem() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-7xl space-y-5 px-3 py-4 sm:space-y-6 sm:px-6 sm:py-6 lg:px-8">
         {role === "player" ? (
           <section className="w-full space-y-6">
             {playerTab === "book" && (
@@ -4414,7 +4426,7 @@ export function CourtManagementSystem() {
                   </div>
                 )}
 
-                <div className="grid gap-4 md:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {managedCourts
                     .filter((c) => c.enabled)
                     .map((court) => (
@@ -4511,7 +4523,7 @@ export function CourtManagementSystem() {
                       className="grid gap-5"
                       onSubmit={handleBookingFormSubmit}
                     >
-                      <div className="grid gap-2 sm:grid-cols-3">
+                      <div className="grid gap-2 md:grid-cols-3">
                         {bookingSteps.map((step, index) => {
                           const stepNumber = index + 1;
 
@@ -4547,7 +4559,7 @@ export function CourtManagementSystem() {
                             <Label className="text-sm font-semibold text-stone-900">
                               1. Select Court
                             </Label>
-                            <div className="grid gap-3 sm:grid-cols-3">
+                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                               {managedCourts.map((court) => {
                                 const isSelected = selectedCourtId === court.id;
 
@@ -4732,7 +4744,7 @@ export function CourtManagementSystem() {
                               </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                            <div className="grid gap-2.5 min-[420px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                               {slotOptions.map((slot) => {
                                 const startMin = timeToMinutes(slot.time);
                                 const selStartMin =
@@ -4911,7 +4923,7 @@ export function CourtManagementSystem() {
 
                           {/* Summary & Conflict Alert */}
                           <div className="space-y-3 rounded-lg border border-stone-200 bg-stone-50 p-4">
-                            <div className="grid gap-3 sm:grid-cols-3">
+                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                               <div>
                                 <p className="text-xs font-medium text-stone-600">
                                   Reserved Schedule
@@ -5185,13 +5197,13 @@ export function CourtManagementSystem() {
                           </div>
 
                           {/* Payment Section */}
-                          <div className="grid gap-6 md:grid-cols-[1fr_1.2fr] border-t border-stone-200 pt-6">
+                          <div className="grid gap-6 border-t border-stone-200 pt-6 md:grid-cols-[1fr_1.2fr]">
                             <div className="space-y-4">
                               <div>
                                 <Label className="text-sm font-semibold text-stone-900">
                                   Payment Method
                                 </Label>
-                                <div className="mt-2 grid grid-cols-2 gap-2">
+                                <div className="mt-2 grid gap-2 min-[420px]:grid-cols-2">
                                   {(
                                     [
                                       "GCash",
@@ -5268,7 +5280,7 @@ export function CourtManagementSystem() {
                               <h4 className="text-sm font-bold text-stone-950">
                                 Manager Payment Details
                               </h4>
-                              <div className="grid grid-cols-[100px_1fr] gap-4">
+                              <div className="grid gap-4 min-[420px]:grid-cols-[100px_1fr]">
                                 <Image
                                   src={paymentInfo.qrCode}
                                   alt="Manager payment QR code"
@@ -6084,7 +6096,7 @@ export function CourtManagementSystem() {
               <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
                 <Card>
                   <CardHeader>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <CardTitle>Courts and Availability</CardTitle>
                         <CardDescription>
@@ -6105,7 +6117,7 @@ export function CourtManagementSystem() {
                         key={court.id}
                       >
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                          <div className="flex gap-4">
+                          <div className="flex min-w-0 flex-col gap-4 min-[420px]:flex-row">
                             {court.image ? (
                               <div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-lg border border-stone-200 bg-stone-100">
                                 <Image
@@ -6174,7 +6186,7 @@ export function CourtManagementSystem() {
                             </div>
                           </div>
 
-                          <div className="flex shrink-0 flex-row gap-2 sm:flex-col sm:items-end">
+                          <div className="grid shrink-0 grid-cols-2 gap-2 sm:flex sm:flex-col sm:items-end">
                             <Button
                               type="button"
                               variant="default"
@@ -6253,7 +6265,7 @@ export function CourtManagementSystem() {
                           />
                         </Field>
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid gap-2 sm:grid-cols-2">
                           <Field>
                             <Label htmlFor="new-court-surface">Surface</Label>
                             <Input
@@ -6278,7 +6290,7 @@ export function CourtManagementSystem() {
                           </Field>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid gap-2 sm:grid-cols-2">
                           <Field>
                             <Label htmlFor="new-court-open">Open</Label>
                             <Input
@@ -6449,7 +6461,7 @@ export function CourtManagementSystem() {
                             }
                           />
                         </Field>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid gap-3 sm:grid-cols-2">
                           <Field>
                             <Label htmlFor="block-start">Start</Label>
                             <Input
@@ -6512,8 +6524,9 @@ export function CourtManagementSystem() {
                           </Badge>
                         )}
                       </div>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="grid w-full gap-2 sm:w-auto sm:grid-cols-2">
                         <Button
+                          className="w-full"
                           type="button"
                           disabled={
                             !selectedOpenPlaySession ||
@@ -6530,6 +6543,7 @@ export function CourtManagementSystem() {
                           Random Teams
                         </Button>
                         <Button
+                          className="w-full"
                           type="button"
                           variant="outline"
                           disabled={!selectedOpenPlaySession}
@@ -6635,7 +6649,7 @@ export function CourtManagementSystem() {
                         </Field>
                         <Field className="md:col-span-2">
                           <Label>Doubles Format</Label>
-                          <div className="grid gap-2 sm:grid-cols-3">
+                          <div className="grid gap-2 md:grid-cols-3">
                             {OPEN_PLAY_FORMAT_OPTIONS.map((format) => {
                               const checked =
                                 newSessionFormats.includes(format);
@@ -6748,35 +6762,39 @@ export function CourtManagementSystem() {
                       ) : (
                         managedSessions.map((session) => (
                           <div
-                            className="rounded-lg border border-stone-200 bg-white p-3 text-sm"
+                            className="min-w-0 rounded-lg border border-stone-200 bg-white p-3 text-sm"
                             key={session.id}
                           >
-                            <div className="flex items-start justify-between gap-3">
-                              <div>
-                                <p className="font-semibold text-stone-950">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                              <div className="min-w-0">
+                                <p className="break-words font-semibold text-stone-950">
                                   {session.title}
                                 </p>
-                                <p className="text-stone-600">
+                                <p className="break-words text-stone-600">
                                   {formatSessionCourts(session)} ·{" "}
                                   {session.date}
                                 </p>
-                                <p className="mt-1 text-stone-600">
+                                <p className="mt-1 break-words text-stone-600">
                                   {session.startTime} - {session.endTime} ·{" "}
                                   {formatSessionSkillLevels(session)} ·{" "}
                                   {formatSessionFormats(session)} ·{" "}
                                   {formatCurrency(session.fee)}
                                 </p>
                               </div>
-                              <Badge variant={statusVariant(session.status)}>
+                              <Badge
+                                className="self-start"
+                                variant={statusVariant(session.status)}
+                              >
                                 {session.status}
                               </Badge>
                             </div>
-                            <div className="mt-3 flex items-center justify-between gap-3">
+                            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                               <span>
                                 {session.joinedPlayers}/{session.maxPlayers}{" "}
                                 players
                               </span>
                               <Button
+                                className="w-full sm:w-auto"
                                 size="sm"
                                 type="button"
                                 variant="outline"
@@ -6816,13 +6834,13 @@ export function CourtManagementSystem() {
                                 ))}
                               </Select>
                             </Field>
-                            <div className="rounded-lg border border-stone-200 bg-white p-4">
-                              <div className="flex items-start justify-between gap-3">
-                                <div>
-                                  <p className="font-semibold text-stone-950">
+                            <div className="min-w-0 rounded-lg border border-stone-200 bg-white p-4">
+                              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                                <div className="min-w-0">
+                                  <p className="break-words font-semibold text-stone-950">
                                     {selectedOpenPlaySession.title}
                                   </p>
-                                  <p className="mt-1 text-sm text-stone-600">
+                                  <p className="mt-1 break-words text-sm text-stone-600">
                                     {formatSessionCourts(
                                       selectedOpenPlaySession,
                                     )}{" "}
@@ -6834,6 +6852,7 @@ export function CourtManagementSystem() {
                                   </p>
                                 </div>
                                 <Badge
+                                  className="self-start"
                                   variant={statusVariant(
                                     selectedOpenPlaySession.status,
                                   )}
@@ -6858,7 +6877,7 @@ export function CourtManagementSystem() {
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid gap-3 min-[420px]:grid-cols-2">
                             <StatTile
                               accent="bg-lime-50 text-lime-800"
                               icon={Users}
@@ -6923,13 +6942,13 @@ export function CourtManagementSystem() {
 
                               return (
                                 <div
-                                  className="rounded-lg border border-stone-200 bg-white p-4"
+                                  className="min-w-0 rounded-lg border border-stone-200 bg-white p-4"
                                   key={applicant.id}
                                 >
-                                <div className="grid gap-4 lg:grid-cols-[1fr_1fr_auto] lg:items-center">
-                                  <div>
+                                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-center">
+                                  <div className="min-w-0">
                                     <div className="flex flex-wrap items-center gap-2">
-                                      <p className="font-semibold text-stone-950">
+                                      <p className="break-words font-semibold text-stone-950">
                                         {applicant.playerName}
                                       </p>
                                       <Badge variant="info">
@@ -6943,14 +6962,14 @@ export function CourtManagementSystem() {
                                         {applicant.status}
                                       </Badge>
                                     </div>
-                                    <p className="mt-2 text-sm text-stone-600">
+                                    <p className="mt-2 break-words text-sm text-stone-600">
                                       {applicant.paymentMethod} ·{" "}
                                       {formatCurrency(applicant.amount)} ·{" "}
                                       {applicant.paymentReference}
                                     </p>
                                   </div>
 
-                                  <div className="text-sm text-stone-600">
+                                  <div className="min-w-0 text-sm text-stone-600">
                                     <Badge
                                       variant={statusVariant(
                                         applicant.paymentStatus,
@@ -6961,7 +6980,7 @@ export function CourtManagementSystem() {
                                     {receiptSrc ? (
                                       <button
                                         type="button"
-                                        className="mt-2 block max-w-48 truncate text-left font-medium text-lime-800 underline hover:text-lime-900"
+                                        className="mt-2 block max-w-full truncate text-left font-medium text-lime-800 underline hover:text-lime-900 sm:max-w-48"
                                         title={receiptLabel}
                                         onClick={() =>
                                           setViewingReceipt({
@@ -6981,8 +7000,9 @@ export function CourtManagementSystem() {
                                     <p>Uploaded payment proof</p>
                                   </div>
 
-                                  <div className="flex flex-wrap gap-2 lg:justify-end">
+                                  <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap lg:justify-end">
                                     <Button
+                                      className="w-full sm:w-auto"
                                       size="sm"
                                       type="button"
                                       onClick={() => {
@@ -6995,6 +7015,7 @@ export function CourtManagementSystem() {
                                       Accept
                                     </Button>
                                     <Button
+                                      className="w-full sm:w-auto"
                                       size="sm"
                                       type="button"
                                       variant="destructive"
@@ -7008,6 +7029,7 @@ export function CourtManagementSystem() {
                                       Reject
                                     </Button>
                                     <Button
+                                      className="col-span-2 w-full sm:col-span-1 sm:w-auto"
                                       size="sm"
                                       type="button"
                                       variant="outline"
@@ -7232,7 +7254,7 @@ export function CourtManagementSystem() {
                                     teamOne={match.playerOne}
                                     teamTwo={match.playerTwo}
                                   />
-                                  <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto_auto]">
+                                  <div className="mt-3 grid gap-2 md:grid-cols-[1fr_auto_auto]">
                                     <Input
                                       aria-label={`Score for ${match.playerOne} versus ${match.playerTwo}`}
                                       placeholder="Score, e.g. 11-8"
@@ -7284,7 +7306,7 @@ export function CourtManagementSystem() {
                               Champion: {openPlayChampion}
                             </div>
                           )}
-                          <div className="mt-4 grid gap-3 md:grid-cols-3">
+                          <div className="mt-4 grid gap-3 lg:grid-cols-3">
                             {COMPETITION_ROUNDS.map((round) => {
                               const roundMatches =
                                 selectedOpenPlayMatches.filter(
@@ -7363,10 +7385,10 @@ export function CourtManagementSystem() {
                     ) : (
                       managedTournaments.map((tournament) => (
                         <div
-                          className="rounded-lg border border-stone-200 bg-white p-3 text-sm"
+                          className="min-w-0 rounded-lg border border-stone-200 bg-white p-3 text-sm"
                           key={tournament.id}
                         >
-                          <div className="flex items-start justify-between gap-3">
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div>
                               <p className="font-semibold text-stone-950">
                                 {tournament.name}
@@ -7567,8 +7589,9 @@ export function CourtManagementSystem() {
                             <h3 className="font-semibold text-stone-950">
                               Tournament Doubles Pairing
                             </h3>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="grid w-full gap-2 sm:w-auto sm:grid-cols-2">
                               <Button
+                                className="w-full"
                                 type="button"
                                 variant="outline"
                                 disabled={
@@ -7588,6 +7611,7 @@ export function CourtManagementSystem() {
                                 Random Teams
                               </Button>
                               <Button
+                                className="w-full"
                                 type="button"
                                 disabled={selectedTournamentMatches.length === 0}
                                 onClick={() =>
@@ -7784,7 +7808,7 @@ export function CourtManagementSystem() {
                                     teamOne={match.playerOne}
                                     teamTwo={match.playerTwo}
                                   />
-                                  <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto_auto]">
+                                  <div className="mt-3 grid gap-2 md:grid-cols-[1fr_auto_auto]">
                                     <Input
                                       aria-label={`Score for ${match.playerOne} versus ${match.playerTwo}`}
                                       placeholder="Score, e.g. 11-8"
@@ -7836,7 +7860,7 @@ export function CourtManagementSystem() {
                               Champion: {selectedTournamentChampion}
                             </div>
                           )}
-                          <div className="mt-4 grid gap-3 md:grid-cols-3">
+                          <div className="mt-4 grid gap-3 lg:grid-cols-3">
                             {COMPETITION_ROUNDS.map((round) => {
                               const roundMatches =
                                 selectedTournamentMatches.filter(
@@ -7915,16 +7939,19 @@ export function CourtManagementSystem() {
                           className="rounded-lg border border-stone-200 bg-white p-3 text-sm"
                           key={eventItem.id}
                         >
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="font-semibold text-stone-950">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="min-w-0">
+                              <p className="break-words font-semibold text-stone-950">
                                 {eventItem.name}
                               </p>
-                              <p className="text-stone-600">
+                              <p className="break-words text-stone-600">
                                 {eventItem.dateTime}
                               </p>
                             </div>
-                            <Badge variant={statusVariant(eventItem.status)}>
+                            <Badge
+                              className="self-start"
+                              variant={statusVariant(eventItem.status)}
+                            >
                               {eventItem.status}
                             </Badge>
                           </div>
@@ -8101,9 +8128,9 @@ export function CourtManagementSystem() {
           </section>
         )}
         {editingCourt && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-            <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-stone-200 bg-white p-6 shadow-2xl">
-              <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+          <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-3 backdrop-blur-xs sm:items-center sm:p-4">
+            <div className="my-3 max-h-[calc(100svh-1.5rem)] w-full max-w-2xl overflow-y-auto rounded-xl border border-stone-200 bg-white p-4 shadow-2xl sm:my-0 sm:max-h-[90vh] sm:rounded-2xl sm:p-6">
+              <div className="flex flex-col gap-3 border-b border-stone-200 pb-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-stone-950">
                     Edit Court — {editingCourt.name}
@@ -8114,6 +8141,7 @@ export function CourtManagementSystem() {
                   </p>
                 </div>
                 <Button
+                  className="self-start sm:self-auto"
                   type="button"
                   variant="outline"
                   size="sm"
@@ -8241,7 +8269,7 @@ export function CourtManagementSystem() {
                   </Field>
                 </div>
 
-                <div className="flex items-center justify-between rounded-xl border border-stone-200 bg-stone-50 p-4">
+                <div className="flex flex-col gap-3 rounded-xl border border-stone-200 bg-stone-50 p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-bold text-stone-950">
                       Active Status
@@ -8344,7 +8372,7 @@ export function CourtManagementSystem() {
                     <p className="text-xs font-semibold text-stone-600 mb-2">
                       Or Choose Preset Photo:
                     </p>
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                       {DEFAULT_COURT_IMAGES.map((preset) => (
                         <button
                           key={preset.url}
@@ -8377,7 +8405,7 @@ export function CourtManagementSystem() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-stone-200">
+                <div className="flex flex-col-reverse gap-3 border-t border-stone-200 pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                   <Button
                     type="button"
                     variant="destructive"
@@ -8387,7 +8415,7 @@ export function CourtManagementSystem() {
                     Delete Court
                   </Button>
 
-                  <div className="flex gap-2">
+                  <div className="grid w-full gap-2 sm:w-auto sm:grid-cols-2">
                     <Button
                       type="button"
                       variant="outline"
@@ -8404,9 +8432,9 @@ export function CourtManagementSystem() {
         )}
 
         {viewingReceipt && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs">
-            <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-stone-200 bg-white p-6 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-stone-200 pb-3">
+          <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/75 p-3 backdrop-blur-xs sm:items-center sm:p-4">
+            <div className="my-3 w-full max-w-lg space-y-4 overflow-hidden rounded-xl border border-stone-200 bg-white p-4 shadow-2xl sm:my-0 sm:rounded-2xl sm:p-6">
+              <div className="flex flex-col gap-3 border-b border-stone-200 pb-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <h3 className="text-lg font-bold text-stone-950">
                     {viewingReceipt.title}
@@ -8416,6 +8444,7 @@ export function CourtManagementSystem() {
                   </p>
                 </div>
                 <Button
+                  className="self-start sm:self-auto"
                   type="button"
                   variant="outline"
                   size="sm"
@@ -8451,7 +8480,7 @@ export function CourtManagementSystem() {
                 )}
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-stone-200">
+              <div className="grid gap-2 border-t border-stone-200 pt-2 sm:flex sm:justify-end">
                 <a
                   href={viewingReceipt.src}
                   target="_blank"
@@ -8531,6 +8560,7 @@ function BookingList({
                 </div>
                 {booking.status === "Pending" && onCancel && (
                   <Button
+                    className="w-full sm:w-auto"
                     size="sm"
                     type="button"
                     variant="outline"
@@ -8589,7 +8619,7 @@ function AdminBookingRows({
             className="rounded-lg border border-stone-200 bg-white p-4 shadow-xs"
             key={booking.id}
           >
-            <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr_1.4fr_auto] xl:items-center">
+            <div className="grid gap-4 lg:grid-cols-[1.2fr_0.9fr] xl:grid-cols-[1.3fr_1fr_1.4fr_auto] xl:items-center">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-base font-extrabold text-stone-950">
@@ -8623,7 +8653,7 @@ function AdminBookingRows({
               </div>
 
               {/* Uploaded Payment Proof Section */}
-              <div className="flex items-center gap-3 text-sm text-stone-600">
+              <div className="flex min-w-0 items-center gap-3 text-sm text-stone-600">
                 {receiptSrc && isImageReceipt ? (
                   <button
                     type="button"
@@ -8683,7 +8713,7 @@ function AdminBookingRows({
                   {booking.receiptName ? (
                     <button
                       type="button"
-                      className="block max-w-36 truncate text-left text-xs font-semibold text-lime-800 underline hover:text-lime-900"
+                      className="block max-w-[12rem] truncate text-left text-xs font-semibold text-lime-800 underline hover:text-lime-900 sm:max-w-36"
                       title={booking.receiptName}
                       onClick={() =>
                         receiptSrc &&
@@ -8704,8 +8734,9 @@ function AdminBookingRows({
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap xl:justify-end">
                 <Button
+                  className="w-full sm:w-auto"
                   size="sm"
                   type="button"
                   onClick={() => onApprove(booking)}
@@ -8715,6 +8746,7 @@ function AdminBookingRows({
                   Approve
                 </Button>
                 <Button
+                  className="w-full sm:w-auto"
                   size="sm"
                   type="button"
                   variant="destructive"
@@ -8725,6 +8757,7 @@ function AdminBookingRows({
                   Reject
                 </Button>
                 <Button
+                  className="w-full sm:w-auto"
                   size="sm"
                   type="button"
                   variant="outline"
@@ -8734,6 +8767,7 @@ function AdminBookingRows({
                   Verify
                 </Button>
                 <Button
+                  className="w-full sm:w-auto"
                   size="sm"
                   type="button"
                   variant="outline"
@@ -8743,6 +8777,7 @@ function AdminBookingRows({
                   Complete
                 </Button>
                 <Button
+                  className="w-full sm:w-auto"
                   size="sm"
                   type="button"
                   variant="ghost"
