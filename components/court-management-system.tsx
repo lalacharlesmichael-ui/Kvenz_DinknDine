@@ -16,7 +16,9 @@ import {
   Lock,
   LogIn,
   LogOut,
+  Menu,
   Megaphone,
+  MoreHorizontal,
   Pencil,
   Phone,
   Plus,
@@ -633,13 +635,66 @@ function NavButton({
   return (
     <button
       className={cn(
-        "inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 text-sm font-semibold transition-colors",
+        "inline-flex min-h-11 w-full min-w-0 items-center justify-center gap-2 rounded-md px-2 text-center text-sm font-semibold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 focus-visible:ring-offset-2 min-[380px]:px-3 lg:justify-start lg:px-4 [&_svg]:shrink-0",
         active
-          ? "bg-black text-lime-200"
-          : "bg-white text-stone-700 hover:bg-stone-100",
+          ? "bg-stone-950 text-lime-200 shadow-sm"
+          : "text-stone-700 hover:bg-white hover:text-stone-950",
       )}
       type="button"
       aria-pressed={active}
+      aria-current={active ? "page" : undefined}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
+function DrawerNavButton({
+  active,
+  children,
+  onClick,
+}: {
+  active: boolean;
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      className={cn(
+        "flex min-h-11 w-full items-center gap-3 rounded-md px-3 text-left text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500",
+        active
+          ? "bg-stone-950 text-lime-200 shadow-sm"
+          : "text-stone-700 hover:bg-stone-100 hover:text-stone-950",
+      )}
+      type="button"
+      aria-current={active ? "page" : undefined}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
+function MobileBottomNavButton({
+  active,
+  children,
+  onClick,
+}: {
+  active: boolean;
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      className={cn(
+        "flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-md px-1 text-center text-[11px] font-semibold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 active:scale-95",
+        active
+          ? "bg-stone-950 text-lime-200 shadow-sm"
+          : "text-stone-600 hover:bg-stone-100 hover:text-stone-950",
+      )}
+      type="button"
+      aria-current={active ? "page" : undefined}
       onClick={onClick}
     >
       {children}
@@ -986,7 +1041,7 @@ function LandingHero({
       <div className="absolute inset-0 bg-black/55" aria-hidden="true" />
 
       <div className="relative mx-auto flex min-h-[84svh] w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
-        <nav className="flex flex-wrap items-center justify-between gap-4">
+        <nav className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center lg:grid-cols-[1fr_auto_auto]">
           <div className="flex min-w-0 items-center gap-3">
             <Image
               src="/kvenz.jpg"
@@ -1005,28 +1060,28 @@ function LandingHero({
             </div>
           </div>
 
-          <div className="hidden items-center gap-6 rounded-md border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-stone-100 backdrop-blur lg:flex">
+          <div className="order-3 flex w-full items-center justify-between gap-1 rounded-md border border-white/15 bg-white/10 p-1 text-xs font-semibold text-stone-100 backdrop-blur sm:col-span-2 lg:order-none lg:col-span-1 lg:w-auto lg:justify-center lg:text-sm">
             <a
-              className="transition-colors hover:text-lime-200"
+              className="flex-1 rounded px-3 py-2 text-center transition-colors hover:bg-white/10 hover:text-lime-200 lg:flex-none"
               href="#landing"
             >
               Home
             </a>
             <a
-              className="transition-colors hover:text-lime-200"
+              className="flex-1 rounded px-3 py-2 text-center transition-colors hover:bg-white/10 hover:text-lime-200 lg:flex-none"
               href="#features"
             >
               Features
             </a>
             <a
-              className="transition-colors hover:text-lime-200"
+              className="flex-1 rounded px-3 py-2 text-center transition-colors hover:bg-white/10 hover:text-lime-200 lg:flex-none"
               href="#auth-gateway"
             >
               Access
             </a>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end gap-2">
             <Button
               className="border-lime-300/60 bg-white/10 text-white hover:bg-white/20"
               type="button"
@@ -1062,20 +1117,20 @@ function LandingHero({
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button
-              className="w-full bg-lime-300 text-black hover:bg-lime-200 sm:w-auto"
-              size="lg"
-              type="button"
-              onClick={onLogin}
-            >
+              <Button
+                className="w-full bg-lime-300 text-black hover:bg-lime-200 sm:w-auto"
+                size="lg"
+                type="button"
+                onClick={onLogin}
+              >
                 <CalendarClock className="h-5 w-5" aria-hidden="true" />
                 Login to Book
               </Button>
-            <Button
-              className="w-full border-white/30 bg-white/10 text-white hover:bg-white/20 sm:w-auto"
-              size="lg"
-              type="button"
-              variant="outline"
+              <Button
+                className="w-full border-white/30 bg-white/10 text-white hover:bg-white/20 sm:w-auto"
+                size="lg"
+                type="button"
+                variant="outline"
                 onClick={onRegister}
               >
                 <UserPlus className="h-5 w-5" aria-hidden="true" />
@@ -1200,6 +1255,9 @@ export function CourtManagementSystem() {
   const [activeHeaderPopover, setActiveHeaderPopover] = useState<
     "payment" | "notifications" | "announcements" | null
   >(null);
+  const [bookingTransactionOpen, setBookingTransactionOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
 
   const [newCourtName, setNewCourtName] = useState("");
   const [newCourtSurface, setNewCourtSurface] = useState("Cushioned acrylic");
@@ -2477,6 +2535,7 @@ export function CourtManagementSystem() {
       `${bookingSummaryText} was submitted and is waiting for review.`,
       signedInUser?.username,
     );
+    setBookingTransactionOpen(false);
     handlePlayerTabChange("bookings");
   }
 
@@ -4008,10 +4067,162 @@ export function CourtManagementSystem() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f7ef] text-stone-950">
-      <header className="sticky top-0 z-20 border-b border-stone-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-3 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:px-8">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <div className="min-h-screen overflow-x-hidden bg-[#f5f7ef] text-stone-950">
+      <header className="sticky top-0 z-40 border-b border-stone-200 bg-white/95 shadow-sm backdrop-blur">
+        <div className="mx-auto flex min-h-14 w-full max-w-[1600px] items-center justify-between gap-2 px-4 py-2 pt-[calc(0.5rem+env(safe-area-inset-top))] lg:hidden">
+          <div className="flex min-w-0 items-center gap-2">
+            <Image
+              src="/kvenz.jpg"
+              alt="KVENS PLACE DINK & DINE logo"
+              width={40}
+              height={40}
+              className="h-9 w-9 shrink-0 rounded-md border border-lime-300 object-cover shadow-sm"
+            />
+            <div className="min-w-0">
+              <p className="truncate text-xs font-bold uppercase tracking-[0.14em] text-lime-700">
+                Kvenz
+              </p>
+              <h1 className="truncate text-base font-bold leading-5 text-stone-950">
+                Kvenz Pickleball
+              </h1>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-1.5">
+            <div className="relative">
+              <button
+                type="button"
+                aria-label="Notifications"
+                title="Notifications"
+                className={cn(
+                  "relative flex h-11 w-11 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-700 shadow-sm transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 active:scale-95",
+                  activeHeaderPopover === "notifications" &&
+                    "bg-amber-50 text-amber-900 ring-2 ring-amber-200",
+                )}
+                onClick={() => {
+                  setMobileMoreOpen(false);
+                  setActiveHeaderPopover(
+                    activeHeaderPopover === "notifications"
+                      ? null
+                      : "notifications",
+                  );
+                }}
+              >
+                <Bell className="h-5 w-5 text-amber-600" aria-hidden="true" />
+                {unreadNotificationCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold text-white shadow-sm">
+                    {unreadNotificationCount}
+                  </span>
+                )}
+              </button>
+
+              {activeHeaderPopover === "notifications" && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40 bg-transparent"
+                    onClick={() => setActiveHeaderPopover(null)}
+                  />
+                  <div className="fixed inset-x-4 top-[calc(4.25rem+env(safe-area-inset-top))] z-50 mx-auto max-h-[min(75svh,28rem)] max-w-md overflow-hidden rounded-lg border border-stone-200 bg-white p-3 shadow-xl ring-1 ring-black/5">
+                    <div className="mb-3 flex items-center justify-between gap-2 border-b border-stone-100 pb-3">
+                      <h3 className="flex items-center gap-2 font-semibold text-stone-950">
+                        <Bell className="h-4 w-4 text-amber-600" />
+                        Notifications
+                      </h3>
+                      {unreadNotificationCount > 0 && (
+                        <button
+                          type="button"
+                          className="min-h-8 rounded px-2 text-[11px] font-medium text-amber-700 hover:bg-amber-50 hover:text-amber-900"
+                          onClick={() => void markAllNotificationsAsRead()}
+                        >
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-72 space-y-2 overflow-y-auto">
+                      {userNotifications.length === 0 ? (
+                        <p className="p-3 text-center text-xs text-stone-500">
+                          No personal notifications for @{signedInUser?.username}.
+                        </p>
+                      ) : (
+                        userNotifications.map((notification) => (
+                          <button
+                            key={notification.id}
+                            type="button"
+                            className={cn(
+                              "flex min-h-11 w-full items-start justify-between gap-2 rounded-lg border p-2.5 text-left text-xs transition-colors",
+                              notification.readAt
+                                ? "border-stone-100 bg-stone-50 text-stone-600"
+                                : "border-amber-200 bg-amber-50/60 text-stone-900 shadow-xs hover:bg-amber-50",
+                            )}
+                            onClick={() => {
+                              if (!notification.readAt) {
+                                void markNotificationAsRead(notification.id);
+                              }
+                            }}
+                          >
+                            <span className="min-w-0">
+                              {!notification.readAt && (
+                                <span className="mb-0.5 flex items-center gap-1.5 font-medium text-amber-900">
+                                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+                                  {notification.title || "Notification"}
+                                </span>
+                              )}
+                              <span
+                                className={cn(
+                                  "block",
+                                  !notification.readAt &&
+                                    "font-medium text-stone-900",
+                                )}
+                              >
+                                {notification.message}
+                              </span>
+                            </span>
+                            <span className="shrink-0 text-[10px] text-stone-400">
+                              {notification.createdAt}
+                            </span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <button
+              type="button"
+              aria-label="Open profile"
+              className="flex h-11 w-11 items-center justify-center rounded-md bg-stone-950 text-lime-200 shadow-sm transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 active:scale-95"
+              onClick={() => {
+                setActiveHeaderPopover(null);
+                setMobileMoreOpen(false);
+                setMobileMenuOpen(true);
+              }}
+            >
+              {signedInUser.role === "admin" ? (
+                <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+              ) : (
+                <UserRound className="h-5 w-5" aria-hidden="true" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              aria-label="Open menu"
+              aria-expanded={mobileMenuOpen}
+              className="flex h-11 w-11 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-800 shadow-sm transition-transform hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 active:scale-95"
+              onClick={() => {
+                setActiveHeaderPopover(null);
+                setMobileMoreOpen(false);
+                setMobileMenuOpen(true);
+              }}
+            >
+              <Menu className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+
+        <div className="mx-auto hidden w-full max-w-[1600px] flex-col gap-3 px-4 py-3 sm:px-6 lg:flex lg:flex-row lg:items-center lg:justify-between lg:px-8">
             <div className="flex min-w-0 items-center gap-3">
               <Image
                 src="/kvenz.jpg"
@@ -4030,16 +4241,16 @@ export function CourtManagementSystem() {
               </div>
             </div>
 
-            <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:w-auto lg:justify-end">
-              {/* Top Navbar Icons (Payment, Notifications, Announcements) */}
-              <div className="relative flex items-center gap-2 self-start">
+          <div className="grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center lg:flex lg:w-auto lg:items-center lg:justify-end">
+            <div className="relative grid w-full grid-cols-3 gap-1 rounded-lg border border-stone-200 bg-white p-1 shadow-sm sm:w-auto">
                 <button
                   type="button"
+                  aria-label="Payment Details"
                   title="Payment Details"
                   className={cn(
-                    "relative flex h-10 w-10 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-700 shadow-sm transition-colors hover:bg-stone-50 hover:text-stone-950",
+                    "relative flex h-10 w-full min-w-0 items-center justify-center rounded-md text-stone-700 transition-colors hover:bg-stone-50 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500",
                     activeHeaderPopover === "payment" &&
-                      "border-lime-500 bg-lime-50 text-lime-900 ring-2 ring-lime-200",
+                      "bg-lime-50 text-lime-900 ring-2 ring-lime-200",
                   )}
                   onClick={() =>
                     setActiveHeaderPopover(
@@ -4055,11 +4266,12 @@ export function CourtManagementSystem() {
 
                 <button
                   type="button"
+                  aria-label="Notifications"
                   title="Notifications"
                   className={cn(
-                    "relative flex h-10 w-10 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-700 shadow-sm transition-colors hover:bg-stone-50 hover:text-stone-950",
+                    "relative flex h-10 w-full min-w-0 items-center justify-center rounded-md text-stone-700 transition-colors hover:bg-stone-50 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500",
                     activeHeaderPopover === "notifications" &&
-                      "border-amber-500 bg-amber-50 text-amber-900 ring-2 ring-amber-200",
+                      "bg-amber-50 text-amber-900 ring-2 ring-amber-200",
                   )}
                   onClick={() =>
                     setActiveHeaderPopover(
@@ -4079,11 +4291,12 @@ export function CourtManagementSystem() {
 
                 <button
                   type="button"
+                  aria-label="Announcements"
                   title="Announcements"
                   className={cn(
-                    "relative flex h-10 w-10 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-700 shadow-sm transition-colors hover:bg-stone-50 hover:text-stone-950",
+                    "relative flex h-10 w-full min-w-0 items-center justify-center rounded-md text-stone-700 transition-colors hover:bg-stone-50 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500",
                     activeHeaderPopover === "announcements" &&
-                      "border-sky-500 bg-sky-50 text-sky-900 ring-2 ring-sky-200",
+                      "bg-sky-50 text-sky-900 ring-2 ring-sky-200",
                   )}
                   onClick={() =>
                     setActiveHeaderPopover(
@@ -4112,7 +4325,7 @@ export function CourtManagementSystem() {
                       onClick={() => setActiveHeaderPopover(null)}
                     />
 
-                    <div className="absolute left-0 top-12 z-50 w-[min(calc(100vw-1.5rem),24rem)] rounded-xl border border-stone-200 bg-white p-3 shadow-xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-2 sm:left-auto sm:right-0 sm:p-4">
+                    <div className="absolute right-0 top-12 z-50 w-[min(calc(100vw-2rem),24rem)] rounded-lg border border-stone-200 bg-white p-3 shadow-xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-2 sm:p-4">
                       <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-3">
                         <h3 className="flex items-center gap-2 font-semibold text-stone-950">
                           {activeHeaderPopover === "payment" && (
@@ -4274,50 +4487,263 @@ export function CourtManagementSystem() {
                     </div>
                   </>
                 )}
-              </div>
+            </div>
 
-              {/* User Profile Card */}
-              <div className="flex w-full min-w-0 items-center gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-sm sm:w-auto">
-                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-black text-lime-200">
-                  {signedInUser.role === "admin" ? (
-                    <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-                  ) : (
-                    <UserRound className="h-5 w-5" aria-hidden="true" />
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="truncate text-sm font-semibold text-stone-950">
-                      {signedInUser.fullName}
-                    </p>
-                    <Badge
-                      variant={
-                        signedInUser.role === "admin" ? "default" : "info"
-                      }
-                    >
-                      {signedInUser.role === "admin" ? "Manager" : "Player"}
-                    </Badge>
-                  </div>
-                  <p className="truncate text-xs text-stone-600">
-                    @{signedInUser.username}
+            <div className="flex w-full min-w-0 items-center gap-3 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 shadow-sm sm:min-w-72 lg:w-auto">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-black text-lime-200">
+                {signedInUser.role === "admin" ? (
+                  <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <UserRound className="h-5 w-5" aria-hidden="true" />
+                )}
+              </div>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="truncate text-sm font-semibold text-stone-950">
+                    {signedInUser.fullName}
                   </p>
+                  <Badge
+                    variant={signedInUser.role === "admin" ? "default" : "info"}
+                  >
+                    {signedInUser.role === "admin" ? "Manager" : "Player"}
+                  </Badge>
                 </div>
-                <Button
-                  className="ml-auto"
-                  size="sm"
-                  type="button"
-                  variant="outline"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-4 w-4" aria-hidden="true" />
-                  Logout
-                </Button>
+                <p className="truncate text-xs text-stone-600">
+                  @{signedInUser.username}
+                </p>
               </div>
             </div>
           </div>
+        </div>
+      </header>
 
-          {role === "player" ? (
-            <nav className="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0">
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-50 lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-menu-title"
+        >
+          <button
+            type="button"
+            aria-label="Close menu"
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="relative flex h-full w-[min(88vw,22rem)] flex-col gap-4 overflow-y-auto border-r border-stone-200 bg-white px-4 py-4 shadow-2xl pt-[calc(1rem+env(safe-area-inset-top))]">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <Image
+                  src="/kvenz.jpg"
+                  alt="KVENS PLACE DINK & DINE logo"
+                  width={40}
+                  height={40}
+                  className="h-9 w-9 shrink-0 rounded-md border border-lime-300 object-cover"
+                />
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-bold uppercase tracking-[0.14em] text-lime-700">
+                    Kvenz
+                  </p>
+                  <h2
+                    id="mobile-menu-title"
+                    className="truncate text-base font-bold text-stone-950"
+                  >
+                    Kvenz Pickleball
+                  </h2>
+                </div>
+              </div>
+              <button
+                type="button"
+                aria-label="Close menu"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-700 shadow-sm hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 active:scale-95"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <XCircle className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="flex w-full min-w-0 items-center gap-3 rounded-lg border border-stone-200 bg-stone-50 px-3 py-3 shadow-sm">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-stone-950 text-lime-200">
+                {signedInUser.role === "admin" ? (
+                  <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <UserRound className="h-5 w-5" aria-hidden="true" />
+                )}
+              </div>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="truncate text-sm font-semibold text-stone-950">
+                    {signedInUser.fullName}
+                  </p>
+                  <Badge
+                    variant={signedInUser.role === "admin" ? "default" : "info"}
+                  >
+                    {signedInUser.role === "admin" ? "Manager" : "Player"}
+                  </Badge>
+                </div>
+                <p className="truncate text-xs text-stone-600">
+                  @{signedInUser.username}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-lime-200 bg-lime-50 px-3 py-2">
+              <span className="text-xs font-bold uppercase tracking-[0.14em] text-lime-900">
+                Role
+              </span>
+              <Badge variant={role === "admin" ? "default" : "info"}>
+                {role === "admin" ? "Manager" : "Player"}
+              </Badge>
+            </div>
+
+            {role === "player" ? (
+              <nav className="grid gap-2" aria-label="Mobile player menu">
+                <DrawerNavButton
+                  active={playerTab === "book"}
+                  onClick={() => {
+                    handlePlayerTabChange("book");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <CalendarClock className="h-4 w-4" aria-hidden="true" />
+                  Book
+                </DrawerNavButton>
+                <DrawerNavButton
+                  active={playerTab === "bookings"}
+                  onClick={() => {
+                    handlePlayerTabChange("bookings");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <ClipboardList className="h-4 w-4" aria-hidden="true" />
+                  My Bookings
+                </DrawerNavButton>
+                <DrawerNavButton
+                  active={playerTab === "open-play"}
+                  onClick={() => {
+                    handlePlayerTabChange("open-play");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <Users className="h-4 w-4" aria-hidden="true" />
+                  Open Play
+                </DrawerNavButton>
+                <DrawerNavButton
+                  active={playerTab === "tournaments"}
+                  onClick={() => {
+                    handlePlayerTabChange("tournaments");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <Trophy className="h-4 w-4" aria-hidden="true" />
+                  Tournaments
+                </DrawerNavButton>
+                <DrawerNavButton
+                  active={playerTab === "events"}
+                  onClick={() => {
+                    handlePlayerTabChange("events");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <Megaphone className="h-4 w-4" aria-hidden="true" />
+                  Events
+                </DrawerNavButton>
+              </nav>
+            ) : (
+              <nav className="grid gap-2" aria-label="Mobile manager menu">
+                <DrawerNavButton
+                  active={adminTab === "dashboard"}
+                  onClick={() => {
+                    setAdminTab("dashboard");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
+                  Today
+                </DrawerNavButton>
+                <DrawerNavButton
+                  active={adminTab === "requests"}
+                  onClick={() => {
+                    setAdminTab("requests");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <FileImage className="h-4 w-4" aria-hidden="true" />
+                  Requests
+                </DrawerNavButton>
+                <DrawerNavButton
+                  active={adminTab === "courts"}
+                  onClick={() => {
+                    setAdminTab("courts");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <Settings className="h-4 w-4" aria-hidden="true" />
+                  Courts
+                </DrawerNavButton>
+                <DrawerNavButton
+                  active={adminTab === "open-play"}
+                  onClick={() => {
+                    setAdminTab("open-play");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <Users className="h-4 w-4" aria-hidden="true" />
+                  Compete
+                </DrawerNavButton>
+                <DrawerNavButton
+                  active={adminTab === "reports"}
+                  onClick={() => {
+                    setAdminTab("reports");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <Gauge className="h-4 w-4" aria-hidden="true" />
+                  Reports
+                </DrawerNavButton>
+                <DrawerNavButton
+                  active={adminTab === "settings"}
+                  onClick={() => {
+                    setAdminTab("settings");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <CreditCard className="h-4 w-4" aria-hidden="true" />
+                  Settings
+                </DrawerNavButton>
+              </nav>
+            )}
+
+            <Button
+              className="mt-auto w-full"
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                void handleLogout();
+              }}
+            >
+              <LogOut className="h-4 w-4" aria-hidden="true" />
+              Logout
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className="mx-auto grid min-h-[calc(100svh-5rem)] w-full max-w-[1600px] lg:grid-cols-[18rem_minmax(0,1fr)]">
+        <aside className="z-20 hidden border-b border-stone-200 bg-white/80 backdrop-blur lg:sticky lg:top-20 lg:block lg:h-[calc(100svh-5rem)] lg:border-b-0 lg:border-r">
+          <div className="flex h-full flex-col gap-4 px-4 py-4 sm:px-6 lg:px-5">
+            <div className="flex items-center justify-between gap-3 px-1">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-stone-500">
+                Menu
+              </p>
+              <Badge variant={role === "admin" ? "default" : "info"}>
+                {role === "admin" ? "Manager" : "Player"}
+              </Badge>
+            </div>
+
+            {role === "player" ? (
+              <nav className="grid grid-cols-2 gap-2 rounded-lg border border-stone-200 bg-stone-100 p-1.5 shadow-inner sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-1 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
               <NavButton
                 active={playerTab === "book"}
                 onClick={() => handlePlayerTabChange("book")}
@@ -4355,7 +4781,7 @@ export function CourtManagementSystem() {
               </NavButton>
             </nav>
           ) : (
-            <nav className="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0">
+            <nav className="grid grid-cols-2 gap-2 rounded-lg border border-stone-200 bg-stone-100 p-1.5 shadow-inner sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-1 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
               <NavButton
                 active={adminTab === "dashboard"}
                 onClick={() => setAdminTab("dashboard")}
@@ -4400,10 +4826,20 @@ export function CourtManagementSystem() {
               </NavButton>
             </nav>
           )}
-        </div>
-      </header>
+            <Button
+              className="mt-auto w-full"
+              size="sm"
+              type="button"
+              variant="outline"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" aria-hidden="true" />
+              Logout
+            </Button>
+          </div>
+        </aside>
 
-      <main className="mx-auto w-full max-w-7xl space-y-5 px-3 py-4 sm:space-y-6 sm:px-6 sm:py-6 lg:px-8">
+        <main className="min-w-0 space-y-5 px-4 pb-[calc(9rem+env(safe-area-inset-bottom))] pt-4 sm:space-y-6 sm:px-6 sm:pt-6 lg:px-8 lg:py-6">
         {role === "player" ? (
           <section className="w-full space-y-6">
             {playerTab === "book" && (
@@ -4426,23 +4862,103 @@ export function CourtManagementSystem() {
                   </div>
                 )}
 
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="space-y-4 rounded-lg border border-stone-200 bg-white p-4 shadow-sm lg:hidden">
+                  <div>
+                    <h2 className="text-2xl font-black text-stone-950">
+                      Book a Court
+                    </h2>
+                    <p className="mt-1 text-sm text-stone-600">
+                      Choose your preferred court and schedule.
+                    </p>
+                  </div>
+                  <div className="grid gap-3">
+                    <Field>
+                      <Label htmlFor="mobile-booking-date">Date</Label>
+                      <Input
+                        id="mobile-booking-date"
+                        min={today}
+                        type="date"
+                        value={selectedDate}
+                        onChange={(event) =>
+                          setSelectedDate(event.target.value)
+                        }
+                      />
+                    </Field>
+                    <Field>
+                      <Label htmlFor="mobile-booking-start">Start Time</Label>
+                      <Select
+                        id="mobile-booking-start"
+                        value={selectedStart}
+                        onChange={(event) =>
+                          setSelectedStart(event.target.value)
+                        }
+                      >
+                        {slotOptions.map((slot) => {
+                          const unavailable =
+                            slot.blocked || slot.locked || slot.held;
+
+                          return (
+                            <option
+                              disabled={unavailable}
+                              key={slot.time}
+                              value={slot.time}
+                            >
+                              {formatTimeRange12Hour(
+                                slot.time,
+                                addHours(slot.time, selectedHours),
+                              )}
+                              {slot.blocked
+                                ? " - Blocked"
+                                : slot.locked
+                                  ? " - Locked"
+                                  : slot.held
+                                    ? " - Held"
+                                    : ""}
+                            </option>
+                          );
+                        })}
+                      </Select>
+                    </Field>
+                    <Field>
+                      <Label htmlFor="mobile-booking-duration">Duration</Label>
+                      <Select
+                        id="mobile-booking-duration"
+                        value={selectedHours}
+                        onChange={(event) =>
+                          setSelectedHours(Number(event.target.value))
+                        }
+                      >
+                        {[1, 2, 3, 4].map((hours) => (
+                          <option key={hours} value={hours}>
+                            {hours} {hours === 1 ? "hour" : "hours"}
+                          </option>
+                        ))}
+                      </Select>
+                    </Field>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                   {managedCourts
                     .filter((c) => c.enabled)
-                    .map((court) => (
-                      <button
-                        className={cn(
-                          "group overflow-hidden rounded-xl border bg-white p-0 text-left shadow-sm transition-all hover:border-lime-500 hover:shadow-md",
-                          selectedCourtId === court.id
-                            ? "border-lime-500 ring-2 ring-lime-400"
-                            : "border-stone-200",
-                        )}
-                        key={court.id}
-                        type="button"
-                        onClick={() => handleCourtChange(court.id)}
-                      >
+                    .map((court) => {
+                      const isSelected = selectedCourtId === court.id;
+
+                      return (
+                        <button
+                          aria-pressed={isSelected}
+                          className={cn(
+                            "group mx-auto w-full max-w-lg overflow-hidden rounded-lg border bg-white p-0 text-left shadow-sm transition-all hover:border-lime-500 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 focus-visible:ring-offset-2 active:scale-[0.99] lg:max-w-none lg:rounded-xl",
+                            isSelected
+                              ? "border-lime-500 bg-lime-50/70 shadow-lime-200/70 ring-2 ring-lime-300"
+                              : "border-stone-200",
+                          )}
+                          key={court.id}
+                          type="button"
+                          onClick={() => handleCourtChange(court.id)}
+                        >
                         {court.image ? (
-                          <div className="relative h-36 w-full overflow-hidden bg-stone-100">
+                          <div className="relative aspect-video w-full overflow-hidden bg-stone-100 lg:aspect-auto lg:h-36">
                             <Image
                               src={court.image}
                               alt={court.name}
@@ -4452,73 +4968,149 @@ export function CourtManagementSystem() {
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                             <Badge
                               className="absolute right-2 top-2 shadow-xs"
-                              variant={
-                                selectedCourtId === court.id
-                                  ? "success"
-                                  : "default"
-                              }
+                              variant={isSelected ? "success" : "default"}
                             >
-                              {selectedCourtId === court.id
-                                ? "Selected"
-                                : "Active"}
+                              {isSelected ? (
+                                <span className="inline-flex items-center gap-1">
+                                  <CheckCircle2
+                                    className="h-3 w-3"
+                                    aria-hidden="true"
+                                  />
+                                  Selected ✓
+                                </span>
+                              ) : (
+                                "Available"
+                              )}
                             </Badge>
-                            <span className="absolute bottom-2 left-2 text-xs font-semibold text-white drop-shadow">
+                            <span className="absolute bottom-2 left-2 max-w-[70%] truncate text-xs font-semibold text-white drop-shadow">
                               {court.zone || court.surface}
                             </span>
                           </div>
                         ) : (
-                          <div className="relative flex h-28 w-full items-center justify-center bg-stone-100 text-stone-400">
+                          <div className="relative flex aspect-video w-full items-center justify-center overflow-hidden bg-stone-100 text-stone-400 lg:aspect-auto lg:h-36">
                             <FileImage className="h-8 w-8 opacity-40" />
                             <Badge
                               className="absolute right-2 top-2"
-                              variant={
-                                selectedCourtId === court.id
-                                  ? "success"
-                                  : "default"
-                              }
+                              variant={isSelected ? "success" : "default"}
                             >
-                              {selectedCourtId === court.id
-                                ? "Selected"
-                                : "Active"}
+                              {isSelected ? (
+                                <span className="inline-flex items-center gap-1">
+                                  <CheckCircle2
+                                    className="h-3 w-3"
+                                    aria-hidden="true"
+                                  />
+                                  Selected ✓
+                                </span>
+                              ) : (
+                                "Available"
+                              )}
                             </Badge>
                           </div>
                         )}
 
-                        <div className="p-4">
-                          <div className="flex items-center justify-between gap-3">
-                            <p className="font-bold text-stone-950">
+                        <div className="p-3.5 sm:p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <p className="min-w-0 truncate text-base font-bold text-stone-950">
                               {court.name}
                             </p>
-                            <span className="text-sm font-extrabold text-lime-800">
+                            <span className="shrink-0 text-sm font-extrabold text-lime-800">
                               {formatCurrency(court.pricePerHour)}/hr
                             </span>
                           </div>
-                          <p className="mt-1 text-xs text-stone-600">
+                          <p className="mt-1 text-sm text-stone-600">
                             {court.surface}
                           </p>
-                          <div className="mt-3 flex items-center justify-between text-xs text-stone-500">
-                            <span>
-                              Hours:{" "}
-                              {formatTimeRange12Hour(court.open, court.close)}
-                            </span>
-                            <span className="font-semibold text-lime-700">
-                              Click to Select →
-                            </span>
-                          </div>
+                          <p className="mt-1 text-xs text-stone-500">
+                            Hours:{" "}
+                            {formatTimeRange12Hour(court.open, court.close)}
+                          </p>
+                          <span
+                            className={cn(
+                              "mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-md border px-3 text-sm font-bold transition-colors",
+                              isSelected
+                                ? "border-lime-500 bg-lime-300 text-black"
+                                : "border-stone-200 bg-stone-50 text-stone-800 group-hover:border-lime-300 group-hover:bg-lime-50",
+                            )}
+                          >
+                            {isSelected ? (
+                              <>
+                                <CheckCircle2
+                                  className="h-4 w-4"
+                                  aria-hidden="true"
+                                />
+                                Selected ✓
+                              </>
+                            ) : (
+                              "Select Court"
+                            )}
+                          </span>
                         </div>
-                      </button>
-                    ))}
+                        </button>
+                      );
+                    })}
                 </div>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Step-by-Step Court Booking</CardTitle>
-                    <CardDescription>
-                      Login, choose a schedule, upload proof, and wait for
-                      manager approval.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
+                <Card className="border-lime-200 bg-lime-50/50">
+                  <CardContent className="grid gap-4 p-4 sm:grid-cols-[1fr_auto] sm:items-center sm:p-5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-stone-950">
+                        Booking Summary
+                      </p>
+                      <p className="mt-1 text-sm text-stone-600">
+                        {selectedCourt.name} · {selectedDate} ·{" "}
+                        {formatTimeRange12Hour(selectedStart, selectedEnd)}
+                      </p>
+                      <p className="mt-2 text-lg font-black text-lime-800">
+                        {formatCurrency(grandTotalAmount)}
+                      </p>
+                    </div>
+                    <Button
+                      className="min-h-11 w-full sm:w-auto"
+                      type="button"
+                      onClick={() => {
+                        setBookingStep(1);
+                        setBookingTransactionOpen(true);
+                      }}
+                    >
+                      <Plus className="h-4 w-4" aria-hidden="true" />
+                      New Booking
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {bookingTransactionOpen && (
+                  <div
+                    className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-3 backdrop-blur-xs sm:p-4"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="booking-transaction-title"
+                  >
+                    <div className="my-3 w-full max-w-5xl overflow-hidden rounded-lg border border-stone-200 bg-white shadow-2xl">
+                      <div className="flex flex-col gap-3 border-b border-stone-200 bg-white p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
+                        <div>
+                          <h2
+                            id="booking-transaction-title"
+                            className="text-lg font-bold text-stone-950"
+                          >
+                            Booking Details
+                          </h2>
+                          <p className="text-sm text-stone-600">
+                            Choose a schedule, upload proof, and submit for
+                            manager approval.
+                          </p>
+                        </div>
+                        <Button
+                          className="self-start sm:self-auto"
+                          size="sm"
+                          type="button"
+                          variant="outline"
+                          onClick={() => setBookingTransactionOpen(false)}
+                        >
+                          <XCircle className="h-4 w-4" aria-hidden="true" />
+                          Close
+                        </Button>
+                      </div>
+                      <div className="max-h-[calc(100svh-9rem)] overflow-y-auto p-4 sm:p-5">
                     <form
                       className="grid gap-5"
                       onSubmit={handleBookingFormSubmit}
@@ -5454,8 +6046,10 @@ export function CourtManagementSystem() {
                         {confirmation}
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -5583,12 +6177,55 @@ export function CourtManagementSystem() {
                           )}
 
                           {isPaymentFormOpen && (
-                            <form
-                              className="space-y-4 rounded-lg border border-lime-200 bg-lime-50/60 p-4"
-                              onSubmit={(event) =>
-                                handleOpenPlayApplicationSubmit(event, session)
-                              }
+                            <div
+                              className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-3 backdrop-blur-xs sm:p-4"
+                              role="dialog"
+                              aria-modal="true"
+                              aria-labelledby={`open-play-payment-title-${session.id}`}
                             >
+                              <div className="my-3 w-full max-w-2xl overflow-hidden rounded-lg border border-stone-200 bg-white shadow-2xl">
+                                <div className="flex flex-col gap-3 border-b border-stone-200 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
+                                  <div>
+                                    <h2
+                                      id={`open-play-payment-title-${session.id}`}
+                                      className="text-lg font-bold text-stone-950"
+                                    >
+                                      Open Play Payment
+                                    </h2>
+                                    <p className="text-sm text-stone-600">
+                                      {session.title} ·{" "}
+                                      {formatCurrency(session.fee)}
+                                    </p>
+                                  </div>
+                                  <Button
+                                    className="self-start sm:self-auto"
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      setOpenPlayPaymentSessionId("");
+                                      setOpenPlayStatusMessage("");
+                                      setOpenPlayStatusSessionId("");
+                                      resetOpenPlayPaymentDraft();
+                                    }}
+                                  >
+                                    <XCircle
+                                      className="h-4 w-4"
+                                      aria-hidden="true"
+                                    />
+                                    Close
+                                  </Button>
+                                </div>
+
+                                <form
+                                  className="space-y-4 p-4 sm:p-5"
+                                  onSubmit={(event) =>
+                                    handleOpenPlayApplicationSubmit(
+                                      event,
+                                      session,
+                                    )
+                                  }
+                                >
                               <div className="grid gap-3 text-sm sm:grid-cols-2">
                                 <div className="rounded-md border border-stone-200 bg-white p-3">
                                   <p className="text-xs font-semibold uppercase text-stone-500">
@@ -5684,6 +6321,21 @@ export function CourtManagementSystem() {
                                 )}
                               </Field>
 
+                              {openPlayStatusMessage &&
+                                openPlayStatusSessionId === session.id && (
+                                  <div
+                                    className={cn(
+                                      "rounded-lg border p-3 text-sm font-medium",
+                                      openPlayStatusTone === "error"
+                                        ? "border-rose-200 bg-rose-50 text-rose-900"
+                                        : "border-emerald-200 bg-emerald-50 text-emerald-900",
+                                    )}
+                                    role="status"
+                                  >
+                                    {openPlayStatusMessage}
+                                  </div>
+                                )}
+
                               <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                                 <Button
                                   type="button"
@@ -5713,7 +6365,9 @@ export function CourtManagementSystem() {
                                   Submit for Approval
                                 </Button>
                               </div>
-                            </form>
+                                </form>
+                              </div>
+                            </div>
                           )}
 
                           {openPlayStatusMessage &&
@@ -8500,7 +9154,143 @@ export function CourtManagementSystem() {
             </div>
           </div>
         )}
-      </main>
+        </main>
+      </div>
+
+      {role === "player" && (
+        <>
+          {!mobileMoreOpen &&
+            playerTab === "book" &&
+            hasConfiguredCourts &&
+            selectedCourtId && (
+              <button
+                type="button"
+                className="fixed inset-x-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-40 mx-auto flex min-h-12 max-w-lg items-center justify-center rounded-lg bg-stone-950 px-4 text-center text-sm font-bold text-lime-200 shadow-xl transition-transform hover:bg-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 focus-visible:ring-offset-2 active:scale-[0.98] lg:hidden"
+                onClick={() => {
+                  setBookingStep(1);
+                  setBookingTransactionOpen(true);
+                }}
+              >
+                Continue · {selectedCourt.name} ·{" "}
+                {formatCurrency(selectedCourt.pricePerHour)}/hr
+              </button>
+            )}
+
+          {mobileMoreOpen && (
+            <>
+              <button
+                type="button"
+                aria-label="Close more menu"
+                className="fixed inset-0 z-30 bg-transparent lg:hidden"
+                onClick={() => setMobileMoreOpen(false)}
+              />
+              <div
+                className="fixed inset-x-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-40 mx-auto grid max-w-lg gap-1 rounded-lg border border-stone-200 bg-white p-2 shadow-2xl ring-1 ring-black/5 lg:hidden"
+                role="menu"
+                aria-label="More navigation"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 text-left text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-100 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 active:scale-[0.99]"
+                  onClick={() => {
+                    handlePlayerTabChange("tournaments");
+                    setMobileMoreOpen(false);
+                  }}
+                >
+                  <Trophy className="h-4 w-4" aria-hidden="true" />
+                  Tournaments
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 text-left text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-100 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 active:scale-[0.99]"
+                  onClick={() => {
+                    handlePlayerTabChange("events");
+                    setMobileMoreOpen(false);
+                  }}
+                >
+                  <Megaphone className="h-4 w-4" aria-hidden="true" />
+                  Events
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 text-left text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-100 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 active:scale-[0.99]"
+                  onClick={() => {
+                    setMobileMoreOpen(false);
+                    setMobileMenuOpen(true);
+                  }}
+                >
+                  <UserRound className="h-4 w-4" aria-hidden="true" />
+                  Profile
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 text-left text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-100 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 active:scale-[0.99]"
+                  onClick={() => {
+                    setMobileMoreOpen(false);
+                    void handleLogout();
+                  }}
+                >
+                  <LogOut className="h-4 w-4" aria-hidden="true" />
+                  Logout
+                </button>
+              </div>
+            </>
+          )}
+
+          <nav
+            className="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white/95 px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 shadow-[0_-10px_24px_rgba(0,0,0,0.08)] backdrop-blur lg:hidden"
+            aria-label="Mobile bottom navigation"
+          >
+            <div className="mx-auto grid max-w-lg grid-cols-4 gap-1">
+              <MobileBottomNavButton
+                active={playerTab === "book"}
+                onClick={() => {
+                  handlePlayerTabChange("book");
+                  setMobileMoreOpen(false);
+                }}
+              >
+                <CalendarClock className="h-5 w-5" aria-hidden="true" />
+                Book
+              </MobileBottomNavButton>
+              <MobileBottomNavButton
+                active={playerTab === "bookings"}
+                onClick={() => {
+                  handlePlayerTabChange("bookings");
+                  setMobileMoreOpen(false);
+                }}
+              >
+                <ClipboardList className="h-5 w-5" aria-hidden="true" />
+                My Bookings
+              </MobileBottomNavButton>
+              <MobileBottomNavButton
+                active={playerTab === "open-play"}
+                onClick={() => {
+                  handlePlayerTabChange("open-play");
+                  setMobileMoreOpen(false);
+                }}
+              >
+                <Users className="h-5 w-5" aria-hidden="true" />
+                Open Play
+              </MobileBottomNavButton>
+              <MobileBottomNavButton
+                active={
+                  mobileMoreOpen ||
+                  playerTab === "tournaments" ||
+                  playerTab === "events"
+                }
+                onClick={() => setMobileMoreOpen((isOpen) => !isOpen)}
+              >
+                <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
+                More
+              </MobileBottomNavButton>
+            </div>
+          </nav>
+        </>
+      )}
     </div>
   );
 }
