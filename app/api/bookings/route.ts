@@ -35,6 +35,9 @@ const PADDLE_RENTAL_PRICE = 50;
 const PICKLEBALL_PRICE = 100;
 const RECEIPT_SIGNED_URL_EXPIRES_IN_SECONDS = 60 * 60;
 const MINUTES_PER_DAY = 24 * 60;
+const BUSINESS_TIME_ZONE = "Asia/Manila";
+const dateInputPattern = /^\d{4}-\d{2}-\d{2}$/;
+const timeInputPattern = /^\d{2}:\d{2}$/;
 const bookingSelect = `
   id,
   court_id,
@@ -116,6 +119,28 @@ function timeToMinutes(time: string) {
   const [startHour, startMin] = time.split(":").map(Number);
 
   return (startHour || 0) * 60 + (startMin || 0);
+}
+
+function getBusinessNow() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    day: "2-digit",
+    hour: "2-digit",
+    hourCycle: "h23",
+    minute: "2-digit",
+    month: "2-digit",
+    timeZone: BUSINESS_TIME_ZONE,
+    year: "numeric",
+  }).formatToParts(new Date());
+  const valueByType = Object.fromEntries(
+    parts.map((part) => [part.type, part.value]),
+  );
+  const date = `${valueByType.year}-${valueByType.month}-${valueByType.day}`;
+  const time = `${valueByType.hour}:${valueByType.minute}`;
+
+  return {
+    date,
+    minutes: timeToMinutes(time),
+  };
 }
 
 function courtCloseMinutes(open: string, close: string) {
@@ -504,6 +529,33 @@ export async function POST(request: Request) {
     );
   }
 
+  if (
+    !dateInputPattern.test(bookingDate) ||
+    !timeInputPattern.test(startTime)
+  ) {
+    return NextResponse.json(
+      { error: "Booking date or start time is invalid." },
+      { status: 400 },
+    );
+  }
+
+  const requestedStartMinutes = timeToMinutes(startTime);
+  const businessNow = getBusinessNow();
+
+  if (
+    bookingDate < businessNow.date ||
+    (bookingDate === businessNow.date &&
+      requestedStartMinutes <= businessNow.minutes)
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "This time has already passed. Please choose a future booking time.",
+      },
+      { status: 400 },
+    );
+  }
+
   const { error: profileError } = await supabase
     .from("profiles")
     .upsert(
@@ -586,7 +638,6 @@ export async function POST(request: Request) {
 
   const courtOpenTime = formatDatabaseTime(court.opens_at, "06:00");
   const courtCloseTime = formatDatabaseTime(court.closes_at, "22:00");
-  const requestedStartMinutes = timeToMinutes(startTime);
   const requestedEndMinutes = requestedStartMinutes + hours * 60;
 
   if (

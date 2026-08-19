@@ -165,8 +165,7 @@ const COMPETITION_ROUNDS: CompetitionRound[] = [
   "Finals",
 ];
 
-const today = "2026-08-16";
-const DEFAULT_BOOKING_DATE = "2026-08-20";
+const BUSINESS_TIME_ZONE = "Asia/Manila";
 const noConfiguredCourt: Court = {
   close: "00:00",
   enabled: false,
@@ -207,6 +206,45 @@ const MINUTES_PER_DAY = 24 * 60;
 
 function formatCurrency(value: number) {
   return currency.format(value);
+}
+
+function getBusinessNow() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    day: "2-digit",
+    hour: "2-digit",
+    hourCycle: "h23",
+    minute: "2-digit",
+    month: "2-digit",
+    timeZone: BUSINESS_TIME_ZONE,
+    year: "numeric",
+  }).formatToParts(new Date());
+  const valueByType = Object.fromEntries(
+    parts.map((part) => [part.type, part.value]),
+  );
+  const date = `${valueByType.year}-${valueByType.month}-${valueByType.day}`;
+  const time = `${valueByType.hour}:${valueByType.minute}`;
+
+  return {
+    date,
+    minutes: timeToMinutes(time),
+    time,
+  };
+}
+
+function isPastBookingStart(
+  bookingDate: string,
+  startTime: string,
+  currentTime: ReturnType<typeof getBusinessNow>,
+) {
+  if (bookingDate < currentTime.date) {
+    return true;
+  }
+
+  if (bookingDate > currentTime.date) {
+    return false;
+  }
+
+  return timeToMinutes(startTime) <= currentTime.minutes;
 }
 
 function formatTime12Hour(time24: string): string {
@@ -315,6 +353,16 @@ function getCompleteCourtSlots(court: Court): string[] {
   }
 
   return slots;
+}
+
+function getBookableCourtSlots(
+  court: Court,
+  bookingDate: string,
+  currentTime: ReturnType<typeof getBusinessNow>,
+) {
+  return getCompleteCourtSlots(court).filter(
+    (slot) => !isPastBookingStart(bookingDate, slot, currentTime),
+  );
 }
 
 function statusVariant(
@@ -1205,11 +1253,15 @@ export function CourtManagementSystem() {
   const [paymentInfo, setPaymentInfo] =
     useState<PaymentSettingsState>(paymentSettings);
   const [blockedSlots, setBlockedSlots] = useState<BlockedSlot[]>([]);
+  const [businessNow, setBusinessNow] = useState(() => getBusinessNow());
+  const today = businessNow.date;
   const [bookingDataLoaded, setBookingDataLoaded] = useState(!supabaseReady);
   const [bookingDataMessage, setBookingDataMessage] = useState("");
 
   const [selectedCourtId, setSelectedCourtId] = useState("");
-  const [selectedDate, setSelectedDate] = useState(DEFAULT_BOOKING_DATE);
+  const [selectedDate, setSelectedDate] = useState(
+    () => getBusinessNow().date,
+  );
   const [selectedStart, setSelectedStart] = useState("08:00");
   const [selectedHours, setSelectedHours] = useState(2);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("GCash");
@@ -1318,8 +1370,17 @@ export function CourtManagementSystem() {
   const [newEventName, setNewEventName] = useState("Training Night");
   const [newAnnouncement, setNewAnnouncement] = useState("");
 
+  useEffect(() => {
+    const updateBusinessTime = () => setBusinessNow(getBusinessNow());
+    updateBusinessTime();
+
+    const intervalId = window.setInterval(updateBusinessTime, 60_000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
   const clearBookingDraftInputs = useCallback(() => {
-    setSelectedDate(DEFAULT_BOOKING_DATE);
+    setSelectedDate(today);
     setSelectedHours(2);
     setPaymentMethod("GCash");
     setReference("");
@@ -1332,16 +1393,19 @@ export function CourtManagementSystem() {
     setConfirmation("");
     setConfirmationTone("success");
     setBookingStep(1);
-  }, []);
+  }, [today]);
 
   const resetBookingDraft = useCallback(() => {
     const defaultCourt = managedCourts[0] ?? noConfiguredCourt;
     const defaultSlots = getCompleteCourtSlots(defaultCourt);
+    const futureSlots = getBookableCourtSlots(defaultCourt, today, businessNow);
 
     setSelectedCourtId(defaultCourt.id);
-    setSelectedStart(defaultSlots[0] ?? defaultCourt.open ?? "08:00");
+    setSelectedStart(
+      futureSlots[0] ?? defaultSlots[0] ?? defaultCourt.open ?? "08:00",
+    );
     clearBookingDraftInputs();
-  }, [clearBookingDraftInputs, managedCourts]);
+  }, [businessNow, clearBookingDraftInputs, managedCourts, today]);
 
   const handlePlayerTabChange = useCallback(
     (nextTab: PlayerTab) => {
@@ -1678,9 +1742,16 @@ export function CourtManagementSystem() {
       } else {
         const firstCourt = nextCourts[0];
         const firstCourtSlots = getCompleteCourtSlots(firstCourt);
+        const firstCourtFutureSlots = getBookableCourtSlots(
+          firstCourt,
+          today,
+          getBusinessNow(),
+        );
 
         setSelectedCourtId(firstCourt.id);
-        setSelectedStart(firstCourtSlots[0] ?? firstCourt.open);
+        setSelectedStart(
+          firstCourtFutureSlots[0] ?? firstCourtSlots[0] ?? firstCourt.open,
+        );
         setSlotCourtId(firstCourt.id);
         setNewSessionCourtIds([firstCourt.id]);
       }
@@ -1716,6 +1787,7 @@ export function CourtManagementSystem() {
     refreshOpenPlaySessionsFromServer,
     signedInUser,
     supabaseReady,
+    today,
   ]);
 
   const selectedCourt =
@@ -1776,10 +1848,18 @@ export function CourtManagementSystem() {
         locked: Boolean(approvedBooking),
         lockedBookingId: approvedBooking?.id,
         lockedBy: approvedBooking?.player,
+        past: isPastBookingStart(selectedDate, slot, businessNow),
         time: slot,
       };
     });
-  }, [blockedSlots, bookings, completeSlots, selectedCourt, selectedDate]);
+  }, [
+    blockedSlots,
+    bookings,
+    businessNow,
+    completeSlots,
+    selectedCourt,
+    selectedDate,
+  ]);
 
   const requestedEndMinutes = rangeEndMinutes(selectedStart, selectedEnd);
   const selectedCourtCloseMinutes = courtCloseMinutes(
@@ -1787,6 +1867,12 @@ export function CourtManagementSystem() {
     selectedCourt.close || "22:00",
   );
   const isExceedingClose = requestedEndMinutes > selectedCourtCloseMinutes;
+  const selectedDateInPast = selectedDate < today;
+  const selectedStartInPast = isPastBookingStart(
+    selectedDate,
+    selectedStart,
+    businessNow,
+  );
 
   const overlappingApprovedBooking = bookings.find(
     (b) =>
@@ -1817,12 +1903,20 @@ export function CourtManagementSystem() {
   );
 
   const selectedSlotUnavailable = Boolean(
+    selectedDateInPast ||
+    selectedStartInPast ||
     isExceedingClose ||
     overlappingApprovedBooking ||
     overlappingPendingBooking ||
     overlappingBlock,
   );
-  const unavailableScheduleMessage = isExceedingClose
+  const unavailableScheduleMessage = selectedDateInPast
+    ? `The selected date (${selectedDate}) has already passed. Please choose ${today} or a future date.`
+    : selectedStartInPast
+      ? `The selected start time (${formatTime12Hour(
+          selectedStart,
+        )}) has already passed today. Please choose a future time.`
+      : isExceedingClose
     ? `The requested duration (${formatTimeRange12Hour(
         selectedStart,
         selectedEnd,
@@ -2355,12 +2449,31 @@ export function CourtManagementSystem() {
     return true;
   }
 
+  function handleBookingDateChange(value: string) {
+    const nextDate = value < today ? today : value;
+    const futureSlots = getBookableCourtSlots(
+      selectedCourt,
+      nextDate,
+      businessNow,
+    );
+
+    setSelectedDate(nextDate);
+    setSelectedStart(
+      futureSlots[0] ?? completeSlots[0] ?? selectedCourt.open ?? "08:00",
+    );
+  }
+
   function handleCourtChange(value: string) {
     const nextCourt = managedCourts.find((court) => court.id === value);
     setSelectedCourtId(value);
     if (nextCourt) {
       const slots = getCompleteCourtSlots(nextCourt);
-      setSelectedStart(slots[0] ?? "08:00");
+      const futureSlots = getBookableCourtSlots(
+        nextCourt,
+        selectedDate,
+        businessNow,
+      );
+      setSelectedStart(futureSlots[0] ?? slots[0] ?? "08:00");
     }
   }
 
@@ -4880,7 +4993,7 @@ export function CourtManagementSystem() {
                         type="date"
                         value={selectedDate}
                         onChange={(event) =>
-                          setSelectedDate(event.target.value)
+                          handleBookingDateChange(event.target.value)
                         }
                       />
                     </Field>
@@ -4895,7 +5008,10 @@ export function CourtManagementSystem() {
                       >
                         {slotOptions.map((slot) => {
                           const unavailable =
-                            slot.blocked || slot.locked || slot.held;
+                            slot.past ||
+                            slot.blocked ||
+                            slot.locked ||
+                            slot.held;
 
                           return (
                             <option
@@ -4907,7 +5023,9 @@ export function CourtManagementSystem() {
                                 slot.time,
                                 addHours(slot.time, selectedHours),
                               )}
-                              {slot.blocked
+                              {slot.past
+                                ? " - Past"
+                                : slot.blocked
                                 ? " - Blocked"
                                 : slot.locked
                                   ? " - Locked"
@@ -5279,7 +5397,7 @@ export function CourtManagementSystem() {
                                 type="date"
                                 value={selectedDate}
                                 onChange={(event) =>
-                                  setSelectedDate(event.target.value)
+                                  handleBookingDateChange(event.target.value)
                                 }
                               />
                             </Field>
@@ -5333,6 +5451,10 @@ export function CourtManagementSystem() {
                                   <span className="inline-block h-3 w-3 rounded-full border border-amber-600 bg-amber-400" />
                                   ⏳ Held (Pending)
                                 </span>
+                                <span className="inline-flex items-center gap-1">
+                                  <span className="inline-block h-3 w-3 rounded-full border border-stone-400 bg-stone-300" />
+                                  Past
+                                </span>
                               </div>
                             </div>
 
@@ -5345,6 +5467,38 @@ export function CourtManagementSystem() {
                                 const isSelectedSpan =
                                   startMin >= selStartMin &&
                                   startMin < selEndMin;
+
+                                if (slot.past) {
+                                  return (
+                                    <div
+                                      className="relative flex flex-col justify-between rounded-lg border border-stone-200 bg-stone-100 p-3 text-left text-stone-500 opacity-80 shadow-xs"
+                                      key={slot.time}
+                                      title="This time has already passed."
+                                    >
+                                      <div className="flex items-center justify-between gap-1">
+                                        <span className="text-xs font-bold">
+                                          {formatTimeRange12Hour(
+                                            slot.time,
+                                            slot.endTime,
+                                          )}
+                                        </span>
+                                        <Badge
+                                          className="gap-1 px-1.5 py-0 text-[10px]"
+                                          variant="neutral"
+                                        >
+                                          <Clock
+                                            className="h-2.5 w-2.5"
+                                            aria-hidden="true"
+                                          />
+                                          Past
+                                        </Badge>
+                                      </div>
+                                      <div className="mt-2 text-xs font-semibold">
+                                        No longer available
+                                      </div>
+                                    </div>
+                                  );
+                                }
 
                                 if (slot.locked) {
                                   return (
@@ -5492,7 +5646,10 @@ export function CourtManagementSystem() {
                               {slotOptions.map((slot) => (
                                 <option
                                   disabled={
-                                    slot.blocked || slot.held || slot.locked
+                                    slot.past ||
+                                    slot.blocked ||
+                                    slot.held ||
+                                    slot.locked
                                   }
                                   key={slot.time}
                                   value={slot.time}
@@ -5501,7 +5658,9 @@ export function CourtManagementSystem() {
                                     slot.time,
                                     slot.endTime,
                                   )}
-                                  {slot.locked
+                                  {slot.past
+                                    ? " (Past - no longer available)"
+                                    : slot.locked
                                     ? ` (🔒 Locked - Booked by ${slot.lockedBy || "Player"})`
                                     : slot.held
                                       ? ` (⏳ Held - Pending Review by ${slot.heldBy || "Player"})`
