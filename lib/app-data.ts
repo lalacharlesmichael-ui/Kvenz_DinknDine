@@ -7,9 +7,14 @@ export type BookingStatus =
   | "Cancelled"
   | "Completed";
 
-export type PaymentMethod = "GCash" | "Bank Transfer";
+export type PaymentMethod = "GCash" | "Bank Transfer" | "Cash";
 
-export type PaymentStatus = "Awaiting Proof" | "Submitted" | "Verified" | "Rejected";
+export type PaymentStatus =
+  | "Awaiting Proof"
+  | "Submitted"
+  | "Verified"
+  | "Rejected"
+  | "Unpaid";
 
 export type SkillLevel =
   | "Beginner"

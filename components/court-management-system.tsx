@@ -197,6 +197,14 @@ const DEFAULT_COURT_IMAGES = [
   },
 ];
 
+const PAYMENT_METHOD_OPTIONS: PaymentMethod[] = [
+  "GCash",
+  "Bank Transfer",
+  "Cash",
+];
+const CASH_PAYMENT_NOTE =
+  "Note: Please pay at the venue before your scheduled court time. Your booking is reserved but remains unpaid until the staff receives and confirms your payment. Please arrive at least 15 minutes early. Late arrival or failure to pay may result in the cancellation of your booking.";
+
 const currency = new Intl.NumberFormat("en-PH", {
   currency: "PHP",
   maximumFractionDigits: 0,
@@ -375,9 +383,14 @@ function statusVariant(
   }
 
   if (
-    ["Pending", "Submitted", "Awaiting Proof", "Draft", "In Progress"].includes(
-      status,
-    )
+    [
+      "Pending",
+      "Submitted",
+      "Awaiting Proof",
+      "Unpaid",
+      "Draft",
+      "In Progress",
+    ].includes(status)
   ) {
     return "warning";
   }
@@ -1951,21 +1964,23 @@ export function CourtManagementSystem() {
           : "This schedule is unavailable. Please choose another time.";
   const bookingSteps = [
     "Schedule",
-    "Payment, Proof & Addons",
+    "Payment & Addons",
     "Review",
   ];
+  const needsPaymentProof = paymentMethod !== "Cash";
   const canContinueBooking =
     bookingStep === 1
       ? hasConfiguredCourts && !bookingSetupPending && !selectedSlotUnavailable
       : bookingStep === 2
-        ? reference.trim().length > 0 && receiptName.length > 0
+        ? !needsPaymentProof ||
+          (reference.trim().length > 0 && receiptName.length > 0)
         : true;
   const bookingSubmitDisabled =
     !signedInUser ||
     !hasConfiguredCourts ||
     bookingSetupPending ||
-    receiptName.length === 0 ||
-    reference.trim().length === 0;
+    (needsPaymentProof &&
+      (receiptName.length === 0 || reference.trim().length === 0));
 
   const currentPlayerName = signedInUser?.fullName ?? "You";
   const playerBookings = bookings.filter(
@@ -2527,7 +2542,7 @@ export function CourtManagementSystem() {
       bookingId = globalThis.crypto.randomUUID();
     }
 
-    let receiptPath = receiptDataUrl || receiptName;
+    let receiptPath = needsPaymentProof ? receiptDataUrl || receiptName : "";
 
     if (supabaseReady) {
       try {
@@ -2543,7 +2558,7 @@ export function CourtManagementSystem() {
           return;
         }
 
-        if (receiptFile) {
+        if (needsPaymentProof && receiptFile) {
           const safeFileName = receiptFile.name.replace(
             /[^a-zA-Z0-9._-]/g,
             "-",
@@ -2573,7 +2588,7 @@ export function CourtManagementSystem() {
             id: bookingId,
             paddleQty,
             paymentMethod,
-            paymentReference: reference,
+            paymentReference: needsPaymentProof ? reference : "",
             receiptPath,
             startTime: selectedStart,
           }),
@@ -2615,13 +2630,15 @@ export function CourtManagementSystem() {
       id: bookingId,
       paddleQty: paddleQty > 0 ? paddleQty : undefined,
       paymentMethod,
-      paymentStatus: "Submitted",
+      paymentStatus: needsPaymentProof ? "Submitted" : "Unpaid",
       player: currentPlayerName,
       playerUsername: signedInUser?.username
         ? safeNormalizeUsername(signedInUser.username)
         : undefined,
-      receiptName: receiptDataUrl || receiptFile?.name || receiptName,
-      reference,
+      receiptName: needsPaymentProof
+        ? receiptDataUrl || receiptFile?.name || receiptName
+        : "",
+      reference: needsPaymentProof ? reference : "",
       startTime: selectedStart,
       status: "Pending",
     };
@@ -2642,7 +2659,9 @@ export function CourtManagementSystem() {
 
     setConfirmationTone("success");
     setConfirmation(
-      `Your booking for ${selectedCourt.name} is pending until the manager verifies your ${paymentMethod} receipt.`,
+      needsPaymentProof
+        ? `Your booking for ${selectedCourt.name} is pending until the manager verifies your ${paymentMethod} receipt.`
+        : `Your booking for ${selectedCourt.name} is reserved. Please pay cash at the venue before your scheduled court time.`,
     );
     pushNotification(
       `${bookingSummaryText} was submitted and is waiting for review.`,
@@ -5954,13 +5973,8 @@ export function CourtManagementSystem() {
                                 <Label className="text-sm font-semibold text-stone-900">
                                   Payment Method
                                 </Label>
-                                <div className="mt-2 grid gap-2 min-[420px]:grid-cols-2">
-                                  {(
-                                    [
-                                      "GCash",
-                                      "Bank Transfer",
-                                    ] as PaymentMethod[]
-                                  ).map((method) => (
+                                <div className="mt-2 grid gap-2 min-[420px]:grid-cols-3">
+                                  {PAYMENT_METHOD_OPTIONS.map((method) => (
                                     <button
                                       className={cn(
                                         "rounded-lg border px-3 py-3 text-sm font-semibold transition-colors",
@@ -5971,7 +5985,15 @@ export function CourtManagementSystem() {
                                       key={method}
                                       type="button"
                                       aria-pressed={paymentMethod === method}
-                                      onClick={() => setPaymentMethod(method)}
+                                      onClick={() => {
+                                        setPaymentMethod(method);
+                                        if (method === "Cash") {
+                                          setReference("");
+                                          setReceiptFile(null);
+                                          setReceiptName("");
+                                          setReceiptDataUrl("");
+                                        }
+                                      }}
                                     >
                                       {method}
                                     </button>
@@ -5979,94 +6001,125 @@ export function CourtManagementSystem() {
                                 </div>
                               </div>
 
-                              <Field>
-                                <Label htmlFor="reference">
-                                  Payment Reference Number
-                                </Label>
-                                <Input
-                                  id="reference"
-                                  placeholder="e.g. GC-998822 or BPI-10492"
-                                  value={reference}
-                                  onChange={(event) =>
-                                    setReference(event.target.value)
-                                  }
-                                />
-                              </Field>
+                              {needsPaymentProof ? (
+                                <>
+                                  <Field>
+                                    <Label htmlFor="reference">
+                                      Payment Reference Number
+                                    </Label>
+                                    <Input
+                                      id="reference"
+                                      placeholder="e.g. GC-998822 or BPI-10492"
+                                      value={reference}
+                                      onChange={(event) =>
+                                        setReference(event.target.value)
+                                      }
+                                    />
+                                  </Field>
 
-                              <Field>
-                                <Label htmlFor="receipt">
-                                  Upload Payment Proof / Receipt
-                                </Label>
-                                <Input
-                                  id="receipt"
-                                  accept="image/*,.pdf"
-                                  type="file"
-                                  onChange={handleReceiptChange}
-                                />
-                                {receiptName && (
-                                  <p className="mt-1 text-xs font-semibold text-lime-800">
-                                    Selected file: {receiptName}
-                                  </p>
-                                )}
-                                {receiptDataUrl.startsWith("data:image/") && (
-                                  <div className="mt-3 overflow-hidden rounded-lg border border-stone-300 bg-stone-50 p-2">
-                                    <p className="mb-1 text-xs font-semibold text-stone-700">
-                                      Uploaded Receipt Preview:
-                                    </p>
-                                    <div className="relative h-36 w-full overflow-hidden rounded-md border border-stone-200">
-                                      <Image
-                                        src={receiptDataUrl}
-                                        alt="Uploaded receipt preview"
-                                        fill
-                                        unoptimized
-                                        className="object-contain bg-white"
-                                      />
-                                    </div>
-                                  </div>
-                                )}
-                              </Field>
+                                  <Field>
+                                    <Label htmlFor="receipt">
+                                      Upload Payment Proof / Receipt
+                                    </Label>
+                                    <Input
+                                      id="receipt"
+                                      accept="image/*,.pdf"
+                                      type="file"
+                                      onChange={handleReceiptChange}
+                                    />
+                                    {receiptName && (
+                                      <p className="mt-1 text-xs font-semibold text-lime-800">
+                                        Selected file: {receiptName}
+                                      </p>
+                                    )}
+                                    {receiptDataUrl.startsWith(
+                                      "data:image/",
+                                    ) && (
+                                      <div className="mt-3 overflow-hidden rounded-lg border border-stone-300 bg-stone-50 p-2">
+                                        <p className="mb-1 text-xs font-semibold text-stone-700">
+                                          Uploaded Receipt Preview:
+                                        </p>
+                                        <div className="relative h-36 w-full overflow-hidden rounded-md border border-stone-200">
+                                          <Image
+                                            src={receiptDataUrl}
+                                            alt="Uploaded receipt preview"
+                                            fill
+                                            unoptimized
+                                            className="object-contain bg-white"
+                                          />
+                                        </div>
+                                      </div>
+                                    )}
+                                  </Field>
+                                </>
+                              ) : (
+                                <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+                                  {CASH_PAYMENT_NOTE}
+                                </div>
+                              )}
                             </div>
 
-                            <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-5 shadow-xs">
-                              <h4 className="text-sm font-bold text-stone-950">
-                                Manager Payment Details
-                              </h4>
-                              <div className="grid gap-4 min-[420px]:grid-cols-[100px_1fr]">
-                                <Image
-                                  src={paymentInfo.qrCode}
-                                  alt="Manager payment QR code"
-                                  width={100}
-                                  height={100}
-                                  className="rounded-lg border border-stone-200"
-                                />
-                                <div className="space-y-1 text-sm text-stone-600">
-                                  <p className="font-bold text-stone-950">
-                                    {paymentMethod === "GCash"
-                                      ? "GCash Account"
-                                      : paymentInfo.bankName}
-                                  </p>
-                                  <p className="font-semibold text-stone-900">
-                                    {paymentMethod === "GCash"
-                                      ? paymentInfo.gcashNumber
-                                      : paymentInfo.bankAccountNumber}
-                                  </p>
-                                  <p className="text-xs text-stone-500">
-                                    Account Name: {paymentInfo.bankAccountName}
-                                  </p>
-                                  <p className="mt-2 text-xs text-stone-500">
-                                    Send total{" "}
-                                    <strong className="text-lime-800">
-                                      {formatCurrency(grandTotalAmount)}
-                                    </strong>{" "}
-                                    or court fee{" "}
-                                    <strong className="text-lime-800">
-                                      {formatCurrency(courtAmount)}
-                                    </strong>{" "}
-                                    to confirm.
+                            {needsPaymentProof ? (
+                              <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-5 shadow-xs">
+                                <h4 className="text-sm font-bold text-stone-950">
+                                  Manager Payment Details
+                                </h4>
+                                <div className="grid gap-4 min-[420px]:grid-cols-[100px_1fr]">
+                                  <Image
+                                    src={paymentInfo.qrCode}
+                                    alt="Manager payment QR code"
+                                    width={100}
+                                    height={100}
+                                    className="rounded-lg border border-stone-200"
+                                  />
+                                  <div className="space-y-1 text-sm text-stone-600">
+                                    <p className="font-bold text-stone-950">
+                                      {paymentMethod === "GCash"
+                                        ? "GCash Account"
+                                        : paymentInfo.bankName}
+                                    </p>
+                                    <p className="font-semibold text-stone-900">
+                                      {paymentMethod === "GCash"
+                                        ? paymentInfo.gcashNumber
+                                        : paymentInfo.bankAccountNumber}
+                                    </p>
+                                    <p className="text-xs text-stone-500">
+                                      Account Name:{" "}
+                                      {paymentInfo.bankAccountName}
+                                    </p>
+                                    <p className="mt-2 text-xs text-stone-500">
+                                      Send total{" "}
+                                      <strong className="text-lime-800">
+                                        {formatCurrency(grandTotalAmount)}
+                                      </strong>{" "}
+                                      or court fee{" "}
+                                      <strong className="text-lime-800">
+                                        {formatCurrency(courtAmount)}
+                                      </strong>{" "}
+                                      to confirm.
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="space-y-3 rounded-xl border border-lime-200 bg-lime-50 p-5 shadow-xs">
+                                <h4 className="text-sm font-bold text-stone-950">
+                                  Cash at Venue
+                                </h4>
+                                <p className="text-sm leading-6 text-stone-700">
+                                  Staff will confirm your cash payment when you
+                                  arrive.
+                                </p>
+                                <div className="rounded-lg bg-white p-3 text-sm">
+                                  <span className="text-stone-500">
+                                    Amount to prepare
+                                  </span>
+                                  <p className="text-2xl font-black text-lime-800">
+                                    {formatCurrency(grandTotalAmount)}
                                   </p>
                                 </div>
                               </div>
-                            </div>
+                            )}
                           </div>
                         </div>
                       )}
@@ -6104,7 +6157,13 @@ export function CourtManagementSystem() {
                                 Payment Details
                               </p>
                               <p className="mt-0.5 text-sm font-bold text-stone-950">
+                                {needsPaymentProof ? (
+                                  <>
                                 {paymentMethod} · Ref: {reference || "None"}
+                                  </>
+                                ) : (
+                                  "Cash · Pay at venue"
+                                )}
                               </p>
                               {receiptName && (
                                 <p className="text-xs text-stone-500">
@@ -6138,9 +6197,9 @@ export function CourtManagementSystem() {
                               </p>
                             </div>
                             <p className="max-w-md rounded-lg border border-amber-200 bg-amber-50 p-2.5 text-xs font-medium text-amber-900">
-                              Your booking will remain Pending until the manager
-                              verifies your payment proof. Once approved, your
-                              exact court hours are locked.
+                              {needsPaymentProof
+                                ? "Your booking will remain Pending until the manager verifies your payment proof. Once approved, your exact court hours are locked."
+                                : CASH_PAYMENT_NOTE}
                             </p>
                           </div>
 
@@ -6876,6 +6935,7 @@ export function CourtManagementSystem() {
                         <option value="All">All</option>
                         <option value="GCash">GCash</option>
                         <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Cash">Cash</option>
                       </Select>
                     </Field>
                   </div>

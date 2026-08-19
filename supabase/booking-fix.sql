@@ -7,6 +7,14 @@
 create extension if not exists pgcrypto;
 create extension if not exists btree_gist;
 
+do $$
+begin
+  alter type public.payment_method add value if not exists 'cash';
+exception
+  when duplicate_object then null;
+end
+$$;
+
 alter table public.bookings
   add column if not exists court_amount numeric(10, 2) not null default 0 check (court_amount >= 0),
   add column if not exists paddle_qty integer not null default 0 check (paddle_qty >= 0),

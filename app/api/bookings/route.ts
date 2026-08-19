@@ -224,11 +224,23 @@ function toPaymentMethod(method: unknown) {
     return "bank_transfer";
   }
 
+  if (method === "Cash") {
+    return "cash";
+  }
+
   return null;
 }
 
 function fromPaymentMethod(method: unknown) {
-  return method === "bank_transfer" ? "Bank Transfer" : "GCash";
+  if (method === "bank_transfer") {
+    return "Bank Transfer";
+  }
+
+  if (method === "cash") {
+    return "Cash";
+  }
+
+  return "GCash";
 }
 
 function fromBookingStatus(status: unknown) {
@@ -246,7 +258,7 @@ function fromBookingStatus(status: unknown) {
   }
 }
 
-function fromPaymentStatus(status: unknown) {
+function fromPaymentStatus(status: unknown, method?: unknown) {
   switch (status) {
     case "submitted":
       return "Submitted";
@@ -255,6 +267,10 @@ function fromPaymentStatus(status: unknown) {
     case "rejected":
       return "Rejected";
     default:
+      if (method === "cash") {
+        return "Unpaid";
+      }
+
       return "Awaiting Proof";
   }
 }
@@ -374,7 +390,7 @@ function mapBookingRow(
     id: String(row.id ?? ""),
     paddleQty: Number(row.paddle_qty ?? 0) || undefined,
     paymentMethod: fromPaymentMethod(row.payment_method),
-    paymentStatus: fromPaymentStatus(row.payment_status),
+    paymentStatus: fromPaymentStatus(row.payment_status, row.payment_method),
     player: anonymous ? "Reserved Player" : fullName || "Player",
     playerUsername: anonymous ? undefined : username,
     receiptName: anonymous ? "" : receiptNameFromPath(row.receipt_path),
@@ -504,6 +520,7 @@ export async function POST(request: Request) {
   const paddleQty = toNonNegativeInteger(body.paddleQty);
   const ballQty = toNonNegativeInteger(body.ballQty);
   const requestedAmount = toOptionalNonNegativeNumber(body.amount);
+  const needsPaymentProof = paymentMethod !== "cash";
 
   if (bookingId && !uuidPattern.test(bookingId)) {
     return NextResponse.json(
@@ -518,13 +535,19 @@ export async function POST(request: Request) {
     !startTime ||
     !hours ||
     !paymentMethod ||
-    !paymentReference ||
     paddleQty === null ||
     ballQty === null ||
     requestedAmount === null
   ) {
     return NextResponse.json(
       { error: "Missing booking details." },
+      { status: 400 },
+    );
+  }
+
+  if (needsPaymentProof && (!paymentReference || !receiptPath)) {
+    return NextResponse.json(
+      { error: "Payment reference and proof are required." },
       { status: 400 },
     );
   }
@@ -699,10 +722,10 @@ export async function POST(request: Request) {
     paddle_qty: paddleQty,
     payment_amount: totalAmount,
     payment_method: paymentMethod,
-    payment_reference: paymentReference,
-    payment_status: receiptPath ? "submitted" : "awaiting_proof",
+    payment_reference: needsPaymentProof ? paymentReference : null,
+    payment_status: needsPaymentProof ? "submitted" : "awaiting_proof",
     player_id: user.id,
-    receipt_path: receiptPath || null,
+    receipt_path: needsPaymentProof ? receiptPath : null,
     starts_at: startsAt,
     status: "pending",
     ...(bookingId ? { id: bookingId } : {}),
