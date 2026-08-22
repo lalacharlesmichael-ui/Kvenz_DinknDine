@@ -1276,7 +1276,7 @@ export function CourtManagementSystem() {
     () => getBusinessNow().date,
   );
   const [selectedStart, setSelectedStart] = useState("08:00");
-  const [selectedHours, setSelectedHours] = useState(2);
+  const [selectedHours, setSelectedHours] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("GCash");
   const [reference, setReference] = useState("");
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
@@ -1394,7 +1394,7 @@ export function CourtManagementSystem() {
 
   const clearBookingDraftInputs = useCallback(() => {
     setSelectedDate(today);
-    setSelectedHours(2);
+    setSelectedHours(1);
     setPaymentMethod("GCash");
     setReference("");
     setReceiptFile(null);
